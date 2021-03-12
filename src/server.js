@@ -6,7 +6,13 @@ const mongoose = require("mongoose");
 //routes here
 
 //ERROR HANDLERS
-const {} = require("./errorHandlers");
+const {
+  badRequestHandler,
+  unauthorizedHandler,
+  forbiddenHandler,
+  notFoundHandler,
+  genericErrorHandler,
+} = require("./errorHandlers");
 
 const server = express();
 
@@ -14,7 +20,12 @@ const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(express.json());
 
-//ERROR HANDLERS MIDDLEWARES HERE
+//ERROR HANDLERS MIDDLEWARES
+server.use(badRequestHandler);
+server.use(unauthorizedHandler);
+server.use(forbiddenHandler);
+server.use(notFoundHandler);
+server.use(genericErrorHandler);
 
 console.log(listEndPoints(server));
 mongoose
