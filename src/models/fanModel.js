@@ -22,6 +22,7 @@ const FanSchema = new Schema(
       type: String,
       required: "Please choose your username",
     },
+    //need check
   },
   { timestamps: true }
 );
