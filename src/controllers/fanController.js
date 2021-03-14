@@ -1,6 +1,6 @@
-const mongoose = require("moongose");
+const mongoose = require("mongoose");
 const FanSchema = require("../models/fanModel");
-const Fan = moongose.model("Fan", FanSchema);
+const Fan = mongoose.model("Fan", FanSchema);
 
 const addNewFan = async (req, res, next) => {
   try {
