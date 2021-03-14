@@ -22,9 +22,20 @@ const FanSchema = new Schema(
       type: String,
       required: "Please choose your username",
     },
-    //need check
+    //need to add terms check
   },
   { timestamps: true }
 );
+
+FanSchema.methods.toJSON = function () {
+  const fan = this;
+  const fanObject = fan.toObject();
+
+  delete fanObject.password;
+  delete fanObject.__V;
+  delete fanObject.refreshTokens;
+
+  return fanObject;
+};
 
 module.exports = FanSchema;
