@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 const UserSchema = require("../models/userModel");
-const User = mongoose.model("User", UserSchema);
+const UserModel = mongoose.model("User", UserSchema);
 const { authorize } = require("../middleware/authMiddleware");
 const { authenticate, refreshToken } = require("../middleware/authTools");
 const bcrypt = require("bcryptjs");
 //SIGNUP
 const signup = async (req, res, next) => {
   try {
-    const user = new User({
+    const user = new UserSchema({
       ...req.body,
       password: await bcrypt.hash(req.body.password, 8),
     });
@@ -22,7 +22,7 @@ const signup = async (req, res, next) => {
 //GET users
 const allUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await UserModel.find();
     res.send(users);
   } catch (error) {
     error.httpStatusCode = 400;

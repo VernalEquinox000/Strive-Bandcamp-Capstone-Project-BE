@@ -1,47 +1,15 @@
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const FanSchema = require("../models/fanModel");
-const FanModel = mongoose.model("Fan", FanSchema);
-const ArtistSchema = require("../models/artistModel");
-const ArtistModel = mongoose.model("Artist", ArtistSchema);
-const LabelSchema = require("../models/labelModel");
-const LabelModel = mongoose.model("Label", LabelSchema);
+const UserSchema = require("../models/userModel");
+const UserModel = mongoose.model("User", UserSchema);
 
-//authentication for fans
-const authenticateFan = async (fan) => {
+//authentication
+const authenticate = async (fan) => {
   try {
-    const newAccessToken = await generateAccessToken({ _id: fan._id });
-    const refreshToken = await generateRefreshToken({ _id: fan._id });
-    fan.refreshTokens = fan.refreshTokens.concat(refreshToken);
-    await fan.save();
-    return { token: newAccessToken, refreshToken };
-  } catch (error) {
-    console.log(error);
-    throw new Error();
-  }
-};
-
-//authentication for artists
-const authenticateArtist = async (artist) => {
-  try {
-    const newAccessToken = await generateAccessToken({ _id: artist._id });
-    const refreshToken = await generateRefreshToken({ _id: artist._id });
-    artist.refreshTokens = artist.refreshTokens.concat(refreshToken);
-    await artist.save();
-    return { token: newAccessToken, refreshToken };
-  } catch (error) {
-    console.log(error);
-    throw new Error();
-  }
-};
-
-//authentication for labels
-const authenticateLabel = async (label) => {
-  try {
-    const newAccessToken = await generateAccessToken({ _id: label._id });
-    const refreshToken = await generateRefreshToken({ _id: label._id });
-    label.refreshTokens = label.refreshTokens.concat(refreshToken);
-    await label.save();
+    const newAccessToken = await generateAccessToken({ _id: user._id });
+    const refreshToken = await generateRefreshToken({ _id: user._id });
+    user.refreshTokens = user.refreshTokens.concat(refreshToken);
+    await user.save();
     return { token: newAccessToken, refreshToken };
   } catch (error) {
     console.log(error);
@@ -100,7 +68,7 @@ const verifyRefreshToken = (token) =>
 const refreshToken = async (oldRefreshToken) => {
   try {
     const decoded = await verifyRefreshToken(oldRefreshToken);
-    const fan = await FanModel.findOne({ _id: decoded._id });
+    const user = await UserModel.findOne({ _id: decoded._id });
     const artist = await ArtistModel.findOne({ _id: decoded._id });
     const label = await LabelModel.findOne({ _id: decoded._id });
     if (fan) {
