@@ -30,6 +30,7 @@ const LabelSchema = new Schema(
     //need to add format
 
     //need emailcheck + terms check
+    //also check for a "robot check?"
   },
   { timestamps: true }
 );
