@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Schema = moongose.Schema;
+const Schema = mongoose.Schema;
 
 const LabelSchema = new Schema(
   {
@@ -34,5 +34,38 @@ const LabelSchema = new Schema(
   },
   { timestamps: true }
 );
+
+LabelSchema.methods.toJSON = function () {
+  const label = this;
+  const labelObject = label.toObject();
+
+  delete labelObject.password;
+  delete labelObject.__V;
+  delete labelObject.refreshTokens;
+
+  return labelObject;
+};
+
+LabelSchema.statics.findByCredentials = async function (email, password) {
+  const label = await this.findOne({ email });
+
+  if (label) {
+    const isMatch = await bcrypt.compare(password, label.password);
+    if (isMatch) return label;
+    else return { error: "Username/password incorrect" };
+  } else {
+    return null;
+  }
+};
+
+LabelSchema.pre("save", async function (next) {
+  const label = this;
+  const plainPW = label.password;
+  console.log(label);
+  if (label.isModified("password")) {
+    label.password = await bcrypt.hash(plainPW, 10);
+  }
+  next();
+});
 
 module.exports = LabelSchema;

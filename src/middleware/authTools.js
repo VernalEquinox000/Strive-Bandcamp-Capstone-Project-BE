@@ -4,7 +4,7 @@ const FanSchema = require("../models/fanModel");
 const FanModel = mongoose.model("Fan", FanSchema);
 const ArtistSchema = require("../models/artistModel");
 const ArtistModel = mongoose.model("Artist", ArtistSchema);
-const LabelSchema = rquire("../models/labelModel");
+const LabelSchema = require("../models/labelModel");
 const LabelModel = mongoose.model("Label", LabelSchema);
 
 //authentication for fans
@@ -62,7 +62,7 @@ const generateAccessToken = (payload) =>
     )
   );
 
-verifyAccessToken = (token) =>
+const verifyAccessToken = (token) =>
   new Promise((res, rej) =>
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
@@ -86,7 +86,7 @@ const generateRefreshToken = (payload) =>
     )
   );
 
-verifyRefreshToken = (token) =>
+const verifyRefreshToken = (token) =>
   new Promise((res, rej) =>
     jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
       if (err) {
@@ -97,7 +97,7 @@ verifyRefreshToken = (token) =>
     })
   );
 
-const refresh = async (oldRefreshToken) => {
+const refreshToken = async (oldRefreshToken) => {
   try {
     const decoded = await verifyRefreshToken(oldRefreshToken);
     const fan = await FanModel.findOne({ _id: decoded._id });
@@ -150,6 +150,7 @@ const refresh = async (oldRefreshToken) => {
       const newRefreshTokensList = label.refreshTokens
         .filter((token) => token !== oldRefreshToken)
         .concat(newRefreshToken);
+
       label.refreshTokens = [...newRefreshTokensList];
       await label.save();
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
@@ -159,4 +160,10 @@ const refresh = async (oldRefreshToken) => {
   }
 };
 
-module.exports = {};
+module.exports = {
+  authenticateFan,
+  authenticateArtist,
+  authenticateLabel,
+  verifyAccessToken,
+  refreshToken,
+};

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const bcrypt = require("bcryptjs");
 
 const FanSchema = new Schema(
   {
@@ -37,5 +38,27 @@ FanSchema.methods.toJSON = function () {
 
   return fanObject;
 };
+
+FanSchema.statics.findByCredentials = async function (email, password) {
+  const fan = await this.findOne({ email });
+
+  if (fan) {
+    const isMatch = await bcrypt.compare(password, fan.password);
+    if (isMatch) return fan;
+    else return { error: "Username/password incorrect" };
+  } else {
+    return null;
+  }
+};
+
+FanSchema.pre("save", async function (next) {
+  const fan = this;
+  const plainPW = fan.password;
+  console.log(fan);
+  if (fan.isModified("password")) {
+    fan.password = await bcrypt.hash(plainPW, 10);
+  }
+  next();
+});
 
 module.exports = FanSchema;
