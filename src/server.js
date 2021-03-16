@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const listEndPoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
-const fanRoutes = require("./routes/fanRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 //routes here
 
@@ -20,7 +20,7 @@ const server = express();
 const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(express.json());
-fanRoutes(server); //fan
+userRoutes(server); //user
 
 //ERROR HANDLERS MIDDLEWARES
 server.use(badRequestHandler);
