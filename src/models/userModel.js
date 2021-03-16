@@ -35,6 +35,7 @@ const UserSchema = new Schema(
     url: {
       type: String,
     },
+    role: ["user", "artist", "label"],
     //need to add terms check
   },
   { timestamps: true }
@@ -63,7 +64,7 @@ UserSchema.statics.findByCredentials = async function (email, password) {
   }
 };
 
-userSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) {
   const user = this;
   const plainPW = user.password;
   console.log(user);

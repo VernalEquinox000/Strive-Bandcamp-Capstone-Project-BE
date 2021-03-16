@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const UserSchema = require("../models/userModel");
 const UserModel = mongoose.model("User", UserSchema);
+const bcrypt = require("bcryptjs");
 const { authorize } = require("../middleware/authMiddleware");
 const { authenticate, refreshToken } = require("../middleware/authTools");
-const bcrypt = require("bcryptjs");
+
 //SIGNUP
 const signup = async (req, res, next) => {
   try {
@@ -17,6 +18,26 @@ const signup = async (req, res, next) => {
       res.status(201).send(user);
     } else throw new Error("Email, username and password are required");
   } catch (error) {}
+};
+
+//LOGIN
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserModel.findByCredentials(email, password);
+
+    if (user === null) {
+      res.status(404).send({ error: "user not found" });
+    } else if (user.error) {
+      res.stauts(403).send(user);
+    } else {
+      const token = await authenticate(user);
+      console.log(token);
+      //add cookie
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
 //GET users

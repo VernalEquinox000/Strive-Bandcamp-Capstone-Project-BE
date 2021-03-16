@@ -69,59 +69,25 @@ const refreshToken = async (oldRefreshToken) => {
   try {
     const decoded = await verifyRefreshToken(oldRefreshToken);
     const user = await UserModel.findOne({ _id: decoded._id });
-    const artist = await ArtistModel.findOne({ _id: decoded._id });
-    const label = await LabelModel.findOne({ _id: decoded._id });
-    if (fan) {
-      const currentRefreshToken = fan.refreshTokens.find(
+    if (user) {
+      const currentRefreshToken = user.refreshTokens.find(
         (token) => token === oldRefreshToken
       );
       if (!currentRefreshToken) {
-        throw new Error("Bad refresh token for fan profile provided");
+        throw new Error("Bad refresh token for user profile provided");
       }
-      const newAccessToken = await generateAccessToken({ _id: fan._id });
-      const newRefreshToken = await generateRefreshToken({ _id: fan._id });
+      const newAccessToken = await generateAccessToken({ _id: user._id });
+      const newRefreshToken = await generateRefreshToken({ _id: user._id });
 
-      const newRefreshTokensList = fan.refreshTokens
+      const newRefreshTokensList = user.refreshTokens
         .filter((token) => token !== oldRefreshToken)
         .concat(newRefreshToken);
 
-      fan.refreshTokens = [...newRefreshTokensList];
-      await fan.save();
+      user.refreshTokens = [...newRefreshTokensList];
+      await user.save();
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-    } else if (artist) {
-      const currentRefreshToken = artist.refreshTokens.find(
-        (token) => token === oldRefreshToken
-      );
-      if (!currentRefreshToken) {
-        throw new Error("Bad refresh token for artist profile provided");
-      }
-      const newAccessToken = await generateAccessToken({ _id: artist._id });
-      const newRefreshToken = await generateRefreshToken({ _id: artist._id });
-
-      const newRefreshTokensList = artist.refreshTokens
-        .filter((token) => token !== oldRefreshToken)
-        .concat(newRefreshToken);
-
-      artist.refreshTokens = [...newRefreshTokensList];
-      await artist.save();
-      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
-    } else if (label) {
-      const currentRefreshToken = label.refreshTokens.find(
-        (token) => token === oldRefreshToken
-      );
-      if (!currentRefreshToken) {
-        throw new Error("Bad refresh token for label profile provided");
-      }
-      const newAccessToken = await generateAccessToken({ _id: label._id });
-      const newRefreshToken = await generateRefreshToken({ _id: label._id });
-
-      const newRefreshTokensList = label.refreshTokens
-        .filter((token) => token !== oldRefreshToken)
-        .concat(newRefreshToken);
-
-      label.refreshTokens = [...newRefreshTokensList];
-      await label.save();
-      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    } else {
+      return "No user found!";
     }
   } catch (error) {
     console.log(error);
@@ -129,9 +95,7 @@ const refreshToken = async (oldRefreshToken) => {
 };
 
 module.exports = {
-  authenticateFan,
-  authenticateArtist,
-  authenticateLabel,
+  authenticate,
   verifyAccessToken,
   refreshToken,
 };

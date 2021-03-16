@@ -1,12 +1,8 @@
-const {
-  signupUser,
-  allUsers,
-  addNewUser,
-} = require("../controllers/userController");
+const { signup, allUsers } = require("../controllers/userController");
 
 const routes = (app) => {
-  app.route("/user/signup").post(signupUser);
-  app.route("/user").post(addNewUser).get(allUsers);
+  app.route("/user/signup").post(signup);
+  app.route("/user").get(allUsers);
 };
 
 module.exports = routes;
