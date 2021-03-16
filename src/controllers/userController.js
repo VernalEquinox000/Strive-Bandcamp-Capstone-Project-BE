@@ -8,7 +8,7 @@ const { authenticate, refreshToken } = require("../middleware/authTools");
 //SIGNUP
 const signup = async (req, res, next) => {
   try {
-    const user = new UserSchema({
+    const user = new UserModel({
       ...req.body,
       password: await bcrypt.hash(req.body.password, 8),
     });
@@ -17,7 +17,10 @@ const signup = async (req, res, next) => {
       const { _id } = await user.save();
       res.status(201).send(user);
     } else throw new Error("Email, username and password are required");
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
 };
 
 //LOGIN
@@ -36,6 +39,7 @@ const login = async (req, res, next) => {
       //add cookie
     }
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -65,4 +69,4 @@ const allUsers = async (req, res, next) => {
   }
 }; */
 
-module.exports = { signup, allUsers };
+module.exports = { signup, login, allUsers };
