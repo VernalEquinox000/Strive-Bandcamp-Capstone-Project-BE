@@ -21,7 +21,19 @@ const UserSchema = new Schema(
     //password must be of 3 chars
     username: {
       type: String,
-      required: "Please choose your username",
+    },
+    artistName: {
+      type: String,
+    },
+    labelName: {
+      type: String,
+    },
+    //need to add URL
+    location: {
+      type: String,
+    },
+    url: {
+      type: String,
     },
     //need to add terms check
   },
