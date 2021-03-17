@@ -39,7 +39,7 @@ const UserSchema = new Schema(
       type: String,
       enum: ["Fan", "Artist", "Label"],
     },
-    refreshTokiens: [{ token: { type: String } }],
+    refreshTokens: [{ token: { type: String } }],
     //need to add terms check
   },
   { timestamps: true }
@@ -68,12 +68,12 @@ UserSchema.methods.toJSON = function () {
   }
 }; */
 
-UserSchema.statics.findByCredentials = async (email, password) => {
+UserSchema.statics.findByCredentials = async function (email, password) {
+  console.log(this);
   const user = await this.findOne({ email });
-  console.log(user);
 
   if (user) {
-    const isMatch = await bcrypt.compare(plainPW, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) return user;
     else return null;
   } else {

@@ -31,22 +31,22 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     console.log(req.body);
-    //const user = await UserModel.findByCredentials({ email, password });
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findByCredentials(email, password);
+    /* const user = await UserModel.findOne({ email });
     console.log(user);
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) res.send(user);
-    else res.send("muori male");
+    else res.send("not cool"); */
 
-    /* if (user === null) {
+    if (user === null) {
       res.status(404).send({ error: "user not found" });
-    } else if (user.error) {
-      res.status(403).send(user);
-    } else { */
-
-    /* const tokens = await authenticate(user);
-    res.send(tokens);
-    console.log(token); */
+      /*  } else if (user.error) {
+         res.status(403).send(user); */
+    } else {
+      const tokens = await authenticate(user);
+      res.send(tokens);
+      console.log(token);
+    }
     //add cookie
   } catch (error) {
     console.log(error);
@@ -65,6 +65,7 @@ const allUsers = async (req, res, next) => {
   }
 };
 
+//GET single user
 const getSingleUser = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.user._id);
@@ -86,6 +87,7 @@ const getSingleUser = async (req, res, next) => {
   }
 };
 
+//GET User By Id
 const getUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.params.userId);
@@ -109,6 +111,32 @@ const getUserById = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+//PUT user
+const updateUser = (req, res, next) => {
+  UserModel.findOneAndUpdate(
+    { _id: req.user._id },
+    req.body,
+    { new: true, useFindAndModify: false },
+    (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.json(user);
+    }
+  );
+};
+
+//DELETE User
+const deleteUser = (req, res, next) => {
+  UserModel.findOneAndDelete({ _id: req.user._id }, (err, user) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(`${req.user._id} deleted`);
+    }
+  });
 };
 
 module.exports = { signup, login, getSingleUser, allUsers, getUserById };
