@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema, model } = require("mongoose");
+//const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
 const UserSchema = new Schema(
@@ -8,11 +8,11 @@ const UserSchema = new Schema(
       type: String,
       trim: true,
       lowercase: true,
-      required: "Email address is required",
+      required: true /* "Email address is required",
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "That email address doesn’t look right.",
-      ],
+      ], */,
     },
     password: {
       type: String,
@@ -35,7 +35,11 @@ const UserSchema = new Schema(
     url: {
       type: String,
     },
-    role: ["user", "artist", "label"],
+    role: {
+      type: String,
+      enum: ["Fan", "Artist", "Label"],
+    },
+    refreshTokiens: [{ token: { type: String } }],
     //need to add terms check
   },
   { timestamps: true }
@@ -52,13 +56,26 @@ UserSchema.methods.toJSON = function () {
   return userObject;
 };
 
-UserSchema.statics.findByCredentials = async function (email, password) {
+/* UserSchema.statics.findByCredentials = async (email, plainPassword) => {
   const user = await this.findOne({ email });
 
   if (user) {
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(plainPassword, user.password);
     if (isMatch) return user;
-    else return { error: "Username/password incorrect" };
+    else return { error: "Email/password incorrect" };
+  } else {
+    return null;
+  }
+}; */
+
+UserSchema.statics.findByCredentials = async (email, password) => {
+  const user = await this.findOne({ email });
+  console.log(user);
+
+  if (user) {
+    const isMatch = await bcrypt.compare(plainPW, user.password);
+    if (isMatch) return user;
+    else return null;
   } else {
     return null;
   }
@@ -66,12 +83,13 @@ UserSchema.statics.findByCredentials = async function (email, password) {
 
 UserSchema.pre("save", async function (next) {
   const user = this;
-  const plainPW = user.password;
+  const plainPassword = user.password;
   console.log(user);
   if (user.isModified("password")) {
-    user.password = await bcrypt.hash(plainPW, 10);
+    user.password = await bcrypt.hash(plainPassword, 10);
   }
   next();
 });
 
-module.exports = UserSchema;
+//module.exports = UserSchema;
+module.exports = model("user", UserSchema);

@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const UserSchema = require("../models/userModel");
-const UserModel = mongoose.model("User", UserSchema);
+/* const UserSchema = require("../models/userModel");
+const UserModel = mongoose.model("User", UserSchema); */
 
 //authentication
-const authenticate = async (fan) => {
+const authenticate = async (user) => {
   try {
     const newAccessToken = await generateAccessToken({ _id: user._id });
     const refreshToken = await generateRefreshToken({ _id: user._id });
@@ -21,7 +21,7 @@ const generateAccessToken = (payload) =>
   new Promise((res, rej) =>
     jwt.sign(
       payload,
-      process.env.JWT.SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: "15m" },
       (err, token) => {
         if (err) rej(err);

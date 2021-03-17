@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const UserSchema = require("../models/userModel");
-const UserModel = mongoose.model("User", UserSchema);
+//const UserSchema = require("../models/userModel");
+//const UserModel = mongoose.model("User", UserSchema);
+const UserModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const { authorize } = require("../middleware/authMiddleware");
 const { authenticate, refreshToken } = require("../middleware/authTools");
@@ -8,15 +9,17 @@ const { authenticate, refreshToken } = require("../middleware/authTools");
 //SIGNUP
 const signup = async (req, res, next) => {
   try {
-    const user = new UserModel({
-      ...req.body,
-      password: await bcrypt.hash(req.body.password, 8),
-    });
-    if (req.body.password && req.body.email && req.body.username) {
+    const newUser = new UserSchema(
+      req.body
+      //password: await bcrypt.hash(req.body.password, 8),
+    );
+    const { _id } = await newUser.save();
+    res.status(201).send(_id);
+    /* if (req.body.password && req.body.email && req.body.username) {
       await user.save();
       const { _id } = await user.save();
       res.status(201).send(user);
-    } else throw new Error("Email, username and password are required");
+    } else throw new Error("Email, username and password are required"); */
   } catch (error) {
     console.log(error);
     next(error);
@@ -27,17 +30,24 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findByCredentials(email, password);
+    console.log(req.body);
+    //const user = await UserModel.findByCredentials({ email, password });
+    const user = await UserModel.findOne({ email });
+    console.log(user);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) res.send(user);
+    else res.send("muori male");
 
-    if (user === null) {
+    /* if (user === null) {
       res.status(404).send({ error: "user not found" });
     } else if (user.error) {
-      res.stauts(403).send(user);
-    } else {
-      const token = await authenticate(user);
-      console.log(token);
-      //add cookie
-    }
+      res.status(403).send(user);
+    } else { */
+
+    /* const tokens = await authenticate(user);
+    res.send(tokens);
+    console.log(token); */
+    //add cookie
   } catch (error) {
     console.log(error);
     next(error);
