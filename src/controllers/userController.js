@@ -65,18 +65,50 @@ const allUsers = async (req, res, next) => {
   }
 };
 
-/* const addNewUser = async (req, res, next) => {
+const getSingleUser = async (req, res, next) => {
   try {
-    let newUser = new Fan(req.body);
-    let user = await newUser.save();
-    console.log("user", user);
-
-    //need to add cookie later
-    res.status(201).send(user);
+    const user = await UserModel.findById(req.user._id);
+    /*       need to add.populate([
+      {
+        path: "following",
+        select: ["_id", "username", "picture"],
+      },
+      {
+        path: "followers",
+        select: ["_id", "username", "picture"],
+      },
+    ]); */
+    res.send(userMe);
   } catch (error) {
-    error.httpStatusCode = 400;
+    error = new Error();
+    error.httpStatusCode = 404;
     next(error);
   }
-}; */
+};
 
-module.exports = { signup, login, allUsers };
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.params.userId);
+    /* .populate([
+      {
+        path: "following",
+        select: ["_id", "username", "picture"],
+      },
+      {
+        path: "followers",
+        select: ["_id", "username", "picture"],
+      },
+    ]); */
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      let error = new Error();
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { signup, login, getSingleUser, allUsers, getUserById };
