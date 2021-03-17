@@ -12,7 +12,7 @@ const authenticate = async (user) => {
     return { token: newAccessToken, refreshToken };
   } catch (error) {
     console.log(error);
-    throw new Error();
+    //throw new Error();
   }
 };
 

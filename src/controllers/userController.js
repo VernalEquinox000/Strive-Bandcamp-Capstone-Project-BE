@@ -9,7 +9,7 @@ const { authenticate, refreshToken } = require("../middleware/authTools");
 //SIGNUP
 const signup = async (req, res, next) => {
   try {
-    const newUser = new UserSchema(
+    const newUser = new UserModel(
       req.body
       //password: await bcrypt.hash(req.body.password, 8),
     );
@@ -38,15 +38,15 @@ const login = async (req, res, next) => {
     if (isMatch) res.send(user);
     else res.send("not cool"); */
 
-    if (user === null) {
+    /* if (user === null) {
       res.status(404).send({ error: "user not found" });
-      /*  } else if (user.error) {
-         res.status(403).send(user); */
-    } else {
-      const tokens = await authenticate(user);
-      res.send(tokens);
-      console.log(token);
-    }
+        } else if (user.error) {
+         res.status(403).send(user);
+    } else { */
+    const tokens = await authenticate(user);
+    res.send(tokens);
+    console.log(token);
+    //}
     //add cookie
   } catch (error) {
     console.log(error);

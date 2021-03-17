@@ -37,7 +37,8 @@ const UserSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["Fan", "Artist", "Label"],
+      enum: ["fan", "artist", "label"],
+      required: true,
     },
     refreshTokens: [{ token: { type: String } }],
     //need to add terms check
