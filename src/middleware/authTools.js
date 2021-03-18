@@ -5,11 +5,13 @@ const mongoose = require("mongoose");
 //authentication
 const authenticate = async (user) => {
   try {
-    const newAccessToken = await generateAccessToken({ _id: user._id });
+    const accessToken = await generateAccessToken({ _id: user._id });
+    console.log(accessToken);
     const refreshToken = await generateRefreshToken({ _id: user._id });
-    user.refreshTokens = user.refreshTokens.concat(refreshToken);
+    console.log(refreshToken);
+    user.refreshTokens = user.refreshTokens.concat({ refreshToken });
     await user.save();
-    return { token: newAccessToken, refreshToken };
+    return { accessToken, refreshToken };
   } catch (error) {
     console.log(error);
     //throw new Error();
@@ -32,10 +34,7 @@ const generateAccessToken = (payload) =>
 const verifyAccessToken = (token) =>
   new Promise((res, rej) =>
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        rej(err);
-      }
+      if (err) rej(err);
       res(decoded);
     })
   );
@@ -56,10 +55,7 @@ const generateRefreshToken = (payload) =>
 const verifyRefreshToken = (token) =>
   new Promise((res, rej) =>
     jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-      if (err) {
-        console.log(err);
-        rej(err);
-      }
+      if (err) rej(err);
       res(decoded);
     })
   );
@@ -97,4 +93,6 @@ module.exports = {
   authenticate,
   verifyAccessToken,
   refreshToken,
+  generateAccessToken,
+  generateRefreshToken,
 };

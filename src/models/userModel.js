@@ -57,28 +57,14 @@ UserSchema.methods.toJSON = function () {
   return userObject;
 };
 
-/* UserSchema.statics.findByCredentials = async (email, plainPassword) => {
-  const user = await this.findOne({ email });
-
-  if (user) {
-    const isMatch = await bcrypt.compare(plainPassword, user.password);
-    if (isMatch) return user;
-    else return { error: "Email/password incorrect" };
-  } else {
-    return null;
-  }
-}; */
-
 UserSchema.statics.findByCredentials = async function (email, password) {
-  console.log(this);
   const user = await this.findOne({ email });
-
   if (user) {
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) return user;
     else return null;
   } else {
-    return null;
+    return { error: "Email/password incorrect" };
   }
 };
 
@@ -92,5 +78,4 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-//module.exports = UserSchema;
-module.exports = model("user", UserSchema);
+module.exports = UserSchema;
