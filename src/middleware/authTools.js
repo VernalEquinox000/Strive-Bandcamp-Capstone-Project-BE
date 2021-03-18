@@ -9,9 +9,9 @@ const authenticate = async (user) => {
     console.log(accessToken);
     const refreshToken = await generateRefreshToken({ _id: user._id });
     console.log(refreshToken);
-    user.refreshTokens = user.refreshTokens.concat({ refreshToken });
+    user.refreshTokens = user.refreshTokens.concat(refreshToken);
     await user.save();
-    return { accessToken, refreshToken };
+    return { token: accessToken, refreshToken };
   } catch (error) {
     console.log(error);
     //throw new Error();

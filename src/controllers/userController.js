@@ -37,8 +37,9 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     req.user.refreshTokens = req.user.refreshTokens.filter(
-      (token) => token !== req.body.refreshToken
+      (token) => token.token !== req.body.refreshToken
     );
+    res.send("bye");
   } catch (error) {
     console.log(error);
     next(error);
@@ -70,7 +71,7 @@ const getSingleUser = async (req, res, next) => {
         select: ["_id", "username", "picture"],
       },
     ]); */
-    res.send(userMe);
+    res.send(user);
   } catch (error) {
     error = new Error();
     error.httpStatusCode = 404;
@@ -130,4 +131,11 @@ const deleteUser = (req, res, next) => {
   });
 };
 
-module.exports = { signup, login, getSingleUser, allUsers, getUserById };
+module.exports = {
+  signup,
+  login,
+  logout,
+  getSingleUser,
+  allUsers,
+  getUserById,
+};

@@ -40,7 +40,7 @@ const UserSchema = new Schema(
       enum: ["fan", "artist", "label"],
       required: true,
     },
-    refreshTokens: [{ token: { type: String } }],
+    refreshTokens: [{ type: String }],
     //need to add terms check
   },
   { timestamps: true }
