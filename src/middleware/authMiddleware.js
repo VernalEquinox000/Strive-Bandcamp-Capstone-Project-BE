@@ -28,4 +28,22 @@ const authorize = async (req, res, next) => {
   }
 };
 
+const artistOnlyMiddleware = async (req, res, next) => {
+  if (req.user && req.user.role === "artist") next();
+  else {
+    const err = new Error("artists only");
+    err.httpStatusCode = 403;
+    next(err);
+  }
+};
+
+const labelOnlyMiddleware = async (req, res, next) => {
+  if (req.user && req.user.role === "label") next();
+  else {
+    const err = new Error("artists only");
+    err.httpStatusCode = 403;
+    next(err);
+  }
+};
+
 module.exports = { authorize };

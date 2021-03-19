@@ -89,8 +89,25 @@ const refreshTokenUtil = async (oldRefreshToken) => {
   }
 };
 
+const googleAuthenticate = async (req, res, next) => {
+  try {
+    res.cookie("accessToken", req.user.tokens.token, {
+      httpOnly: true,
+    });
+    res.cookie("refreshToken", req.user.tokens.refreshToken, {
+      httpOnly: true,
+      path: "/refreshToken",
+    });
+
+    res.status(200).redirect(process.env.FE_URL + "/home");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   authenticate,
   verifyAccessToken,
   refreshTokenUtil,
+  googleAuthenticate,
 };
