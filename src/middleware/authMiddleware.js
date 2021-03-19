@@ -46,4 +46,4 @@ const labelOnlyMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = { authorize };
+module.exports = { authorize, artistOnlyMiddleware, labelOnlyMiddleware };
