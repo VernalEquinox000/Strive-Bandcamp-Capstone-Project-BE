@@ -60,7 +60,7 @@ const verifyRefreshToken = (token) =>
     })
   );
 
-const refreshToken = async (oldRefreshToken) => {
+const refreshTokenUtil = async (oldRefreshToken) => {
   try {
     const decoded = await verifyRefreshToken(oldRefreshToken);
     const user = await UserModel.findOne({ _id: decoded._id });
@@ -92,7 +92,5 @@ const refreshToken = async (oldRefreshToken) => {
 module.exports = {
   authenticate,
   verifyAccessToken,
-  refreshToken,
-  generateAccessToken,
-  generateRefreshToken,
+  refreshTokenUtil,
 };

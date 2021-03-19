@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const UserSchema = require("../models/userModel");
 const UserModel = mongoose.model("User", UserSchema);
 const bcrypt = require("bcryptjs");
-const { authorize } = require("../middleware/authMiddleware");
-const { authenticate, refreshToken } = require("../middleware/authTools");
+const { authenticate, refreshTokenUtil } = require("../middleware/authTools");
 
 //SIGNUP
 const signup = async (req, res, next) => {
@@ -46,15 +45,49 @@ const logout = async (req, res, next) => {
   }
 };
 
-//GET users
+//GET all users
 const allUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find();
     res.send(users);
   } catch (error) {
-    error.httpStatusCode = 400;
     next(error);
   }
+};
+
+//GET user profile
+const meUser = async (req, res, next) => {
+  try {
+    res.send(req.user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//PUT user
+const updateUser = (req, res, next) => {
+  UserModel.findOneAndUpdate(
+    { _id: req.user._id },
+    req.body,
+    { new: true, useFindAndModify: false },
+    (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.json(user);
+    }
+  );
+};
+
+//DELETE User
+const deleteUser = (req, res, next) => {
+  UserModel.findOneAndDelete({ _id: req.user._id }, (err, user) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(`${req.user._id} deleted`);
+    }
+  });
 };
 
 //GET single user
@@ -105,37 +138,34 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-//PUT user
-const updateUser = (req, res, next) => {
-  UserModel.findOneAndUpdate(
-    { _id: req.user._id },
-    req.body,
-    { new: true, useFindAndModify: false },
-    (err, user) => {
-      if (err) {
-        res.send(err);
-      }
-      res.json(user);
+const refreshToken = async (req, res, next) => {
+  const oldRefreshToken = req.body.refreshToken;
+  if (!oldRefreshToken) {
+    const err = new Error("Refresh token missing");
+    err.httpStatusCode = 400;
+    next(err);
+  } else {
+    try {
+      const newTokens = await refreshTokenUtil(oldRefreshToken);
+      res.send(newTokens);
+    } catch (error) {
+      console.log(error);
+      const err = new Error(error);
+      err.httpStatusCode = 403;
+      next(err);
     }
-  );
-};
-
-//DELETE User
-const deleteUser = (req, res, next) => {
-  UserModel.findOneAndDelete({ _id: req.user._id }, (err, user) => {
-    if (err) {
-      res.send(err);
-    } else {
-      res.send(`${req.user._id} deleted`);
-    }
-  });
+  }
 };
 
 module.exports = {
   signup,
   login,
   logout,
-  getSingleUser,
   allUsers,
+  meUser,
+  updateUser,
+  deleteUser,
+  refreshToken,
+  getSingleUser,
   getUserById,
 };
