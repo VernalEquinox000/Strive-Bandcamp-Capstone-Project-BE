@@ -16,7 +16,7 @@ const signup = async (req, res, next) => {
   }
 };
 
-//LOGIN
+//POST Login
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -32,7 +32,7 @@ const login = async (req, res, next) => {
   }
 };
 
-//LOGOUT
+//POST Logout
 const logout = async (req, res, next) => {
   try {
     req.user.refreshTokens = req.user.refreshTokens.filter(
@@ -42,6 +42,38 @@ const logout = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     next(error);
+  }
+};
+
+//POST Logout
+const logoutAll = async (req, res, next) => {
+  try {
+    req.user.refreshToken = [];
+    await req.author.save();
+    res.send();
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+//POST Refresh Token
+const refreshToken = async (req, res, next) => {
+  const oldRefreshToken = req.body.refreshToken;
+  if (!oldRefreshToken) {
+    const err = new Error("Refresh token missing");
+    err.httpStatusCode = 400;
+    next(err);
+  } else {
+    try {
+      const newTokens = await refreshTokenUtil(oldRefreshToken);
+      res.send(newTokens);
+    } catch (error) {
+      console.log(error);
+      const err = new Error(error);
+      err.httpStatusCode = 403;
+      next(err);
+    }
   }
 };
 
@@ -135,25 +167,6 @@ const getUserById = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-  }
-};
-
-const refreshToken = async (req, res, next) => {
-  const oldRefreshToken = req.body.refreshToken;
-  if (!oldRefreshToken) {
-    const err = new Error("Refresh token missing");
-    err.httpStatusCode = 400;
-    next(err);
-  } else {
-    try {
-      const newTokens = await refreshTokenUtil(oldRefreshToken);
-      res.send(newTokens);
-    } catch (error) {
-      console.log(error);
-      const err = new Error(error);
-      err.httpStatusCode = 403;
-      next(err);
-    }
   }
 };
 
