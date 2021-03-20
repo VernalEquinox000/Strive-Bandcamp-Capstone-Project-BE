@@ -45,7 +45,7 @@ const logout = async (req, res, next) => {
   }
 };
 
-//POST Logout
+//POST Logout All
 const logoutAll = async (req, res, next) => {
   try {
     req.user.refreshToken = [];
@@ -168,6 +168,28 @@ const getUserById = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const googleLogin = async (req, res, next) => {
+  passport.authenticate("google", { scope: ["profile", "email"] });
+};
+
+const googleRedirect = async (req, res, next) => {
+  passport.authenticate("google"),
+    async (req, res, next) => {
+      //res.send("YEEEEEEAHHHHH")
+      console.log(req.user.tokens);
+      res.cookie("accessToken", req.user.tokens.token, { httpOnly: true });
+      res.cookie("refreshToken", req.user.tokens.refreshToken, {
+        httpOnly: true,
+        path: "/authors/refreshToken",
+      });
+      res.redirect(process.env.FE_URL); //+ "?accessToken=" + req.user.tokens.accessToken)
+      //attach the token to URL, this so far before cookies
+
+      try {
+      } catch (error) {}
+    };
 };
 
 module.exports = {
