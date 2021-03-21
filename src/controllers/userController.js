@@ -170,26 +170,21 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-const googleLogin = async (req, res, next) => {
-  passport.authenticate("google", { scope: ["profile", "email"] });
-};
+//GET Google Auth
+const googleAuth = async (req, res, next) => {
+  try {
+    res.cookie("accessToken", req.user.tokens.token, {
+      httpOnly: true,
+    });
+    res.cookie("refreshToken", req.user.tokens.refreshToken, {
+      httpOnly: true,
+      path: "/refreshToken",
+    });
 
-const googleRedirect = async (req, res, next) => {
-  passport.authenticate("google"),
-    async (req, res, next) => {
-      //res.send("YEEEEEEAHHHHH")
-      console.log(req.user.tokens);
-      res.cookie("accessToken", req.user.tokens.token, { httpOnly: true });
-      res.cookie("refreshToken", req.user.tokens.refreshToken, {
-        httpOnly: true,
-        path: "/authors/refreshToken",
-      });
-      res.redirect(process.env.FE_URL); //+ "?accessToken=" + req.user.tokens.accessToken)
-      //attach the token to URL, this so far before cookies
-
-      try {
-      } catch (error) {}
-    };
+    res.status(200).redirect(process.env.FE_URL + "/home");
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
@@ -203,4 +198,5 @@ module.exports = {
   refreshToken,
   getSingleUser,
   getUserById,
+  googleAuth,
 };

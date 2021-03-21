@@ -42,6 +42,12 @@ const UserSchema = new Schema(
     },
     refreshTokens: [{ type: String }],
     //need to add terms check
+    googleId: {
+      type: String,
+    },
+    picture: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

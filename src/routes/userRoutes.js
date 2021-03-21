@@ -7,6 +7,7 @@ const {
   updateUser,
   deleteUser,
   refreshToken,
+  googleAuth,
 } = require("../controllers/userController");
 const { authorize } = require("../middleware/authMiddleware");
 
@@ -21,6 +22,10 @@ const routes = (app) => {
     .put(authorize, updateUser)
     .delete(authorize, deleteUser);
   app.route("/users/refreshToken").post(refreshToken);
+  app
+    .route("/googleLogin")
+    .get(passport.authenticate("google", { scope: ["profile", "email"] }));
+  app.route("/googleRedirect").get(passport.authenticate("google"), googleAuth);
 };
 
 module.exports = routes;
