@@ -10,6 +10,7 @@ const {
   googleAuth,
 } = require("../controllers/userController");
 const { authorize } = require("../middleware/authMiddleware");
+const passport = require("passport");
 
 const routes = (app) => {
   app.route("/users/signup").post(signup);

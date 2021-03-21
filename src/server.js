@@ -2,12 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const listEndPoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
-const passport = require("passport");
 
 const userRoutes = require("./routes/userRoutes");
 const oauth = require("./middleware/oauth");
-
-//routes here
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
 
 //ERROR HANDLERS
 const {
@@ -23,6 +22,8 @@ const server = express();
 const port = process.env.PORT || 3001;
 server.use(cors());
 server.use(express.json());
+
+server.use(cookieParser());
 server.use(passport.initialize());
 
 userRoutes(server); //user

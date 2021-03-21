@@ -81,7 +81,13 @@ const refreshToken = async (req, res, next) => {
 const allUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find();
-    res.send(users);
+    if (users.length !== 0) {
+      res.status(200).send(users);
+    } else {
+      let error = new Error();
+      error.httpStatusCode = 404;
+      next(error);
+    }
   } catch (error) {
     next(error);
   }
