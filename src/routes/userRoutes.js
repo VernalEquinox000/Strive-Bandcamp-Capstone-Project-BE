@@ -8,6 +8,7 @@ const {
   deleteUser,
   refreshToken,
   googleAuth,
+  addProfilePic,
 } = require("../controllers/userController");
 const { authorize } = require("../middleware/authMiddleware");
 const passport = require("passport");
@@ -22,6 +23,9 @@ const routes = (app) => {
     .get(authorize, meUser)
     .put(authorize, updateUser)
     .delete(authorize, deleteUser);
+  app
+    .route("/users/profilePic")
+    .post(authorize, cloudMulter.single("picture"), addProfilePic);
   app.route("/users/refreshToken").post(refreshToken);
   app
     .route("/googleLogin")

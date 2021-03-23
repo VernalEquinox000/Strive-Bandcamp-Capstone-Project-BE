@@ -3,8 +3,20 @@ const UserSchema = require("../models/userModel");
 const UserModel = mongoose.model("User", UserSchema);
 const bcrypt = require("bcryptjs");
 const { authenticate, refreshTokenUtil } = require("../middleware/authTools");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../middleware/cloudinary");
 
-//SIGNUP
+const cloudStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "profile",
+  },
+});
+
+const cloudMulter = multer({ storage: cloudStorage });
+
+//POST Signup
 const signup = async (req, res, next) => {
   try {
     const newUser = new UserModel(req.body);
@@ -221,6 +233,23 @@ const googleAuth = async (req, res, next) => {
   }
 };
 
+const addProfilePic = async (req, res, next) => {
+  try {
+    const addPicture = await UserModel.findByIdAndUpdate(req.user_id, {
+      $set: {
+        picture: req.file.path,
+      },
+    });
+    if (addPicture) {
+      res.status(200).send(addPicture);
+    } else {
+      res.send("User not found!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   signup,
   login,
@@ -233,4 +262,5 @@ module.exports = {
   getSingleUser,
   getUserById,
   googleAuth,
+  addProfilePic,
 };
