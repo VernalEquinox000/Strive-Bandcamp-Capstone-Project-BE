@@ -9,6 +9,15 @@ const signup = async (req, res, next) => {
   try {
     const newUser = new UserModel(req.body);
     const { _id } = await newUser.save();
+    //add cookie
+    res.cookie("refreshToken", token.refreshToken, {
+      httpOnly: true,
+      path: "/refreshToken",
+    });
+    res.status(201).cookie("accessToken", token.token, {
+      httpOnly: true,
+    });
+
     res.status(201).send(_id);
   } catch (error) {
     console.log(error);
@@ -24,8 +33,19 @@ const login = async (req, res, next) => {
     console.log(user);
     //insert if?
     const tokens = await authenticate(user);
+    //add cookie
+    res.cookie("refreshToken", token.refreshToken, {
+      httpOnly: true,
+      path: "/refreshToken",
+    });
+
     await user.save();
-    res.send(tokens);
+    res
+      .status(201)
+      .cookie("accessToken", token.token, {
+        httpOnly: true,
+      })
+      .send(tokens);
   } catch (error) {
     console.log(error);
     next(error);
@@ -35,7 +55,7 @@ const login = async (req, res, next) => {
 //POST Logout
 const logout = async (req, res, next) => {
   try {
-    req.user.refreshTokens = req.user.refreshTokens.filter(
+    newRefreshTokens = req.user.refreshTokens.filter(
       (token) => token.token !== req.body.refreshToken
     );
     res.send("bye");
