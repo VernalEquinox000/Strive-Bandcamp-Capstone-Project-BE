@@ -12,7 +12,7 @@ const signup = async (req, res, next) => {
     //add cookie
     res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
-      path: "/refreshToken",
+      path: "/users/refreshToken",
     });
     res.status(201).cookie("accessToken", token.token, {
       httpOnly: true,
@@ -34,15 +34,15 @@ const login = async (req, res, next) => {
     //insert if?
     const tokens = await authenticate(user);
     //add cookie
-    res.cookie("refreshToken", token.refreshToken, {
+    res.cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
-      path: "/refreshToken",
+      path: "/users/refreshToken",
     });
 
     await user.save();
     res
       .status(201)
-      .cookie("accessToken", token.token, {
+      .cookie("accessToken", tokens.accessToken, {
         httpOnly: true,
       })
       .send(tokens);
@@ -58,7 +58,10 @@ const logout = async (req, res, next) => {
     newRefreshTokens = req.user.refreshTokens.filter(
       (token) => token.token !== req.body.refreshToken
     );
-    res.send("bye");
+    await req.user.updateOne({ refreshTokens: newRefreshTokens });
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.send("logged out");
   } catch (error) {
     console.log(error);
     next(error);
@@ -79,6 +82,7 @@ const logoutAll = async (req, res, next) => {
 
 //POST Refresh Token
 const refreshToken = async (req, res, next) => {
+  console.log(req.cookies);
   const oldRefreshToken = req.body.refreshToken;
   if (!oldRefreshToken) {
     const err = new Error("Refresh token missing");
@@ -87,6 +91,10 @@ const refreshToken = async (req, res, next) => {
   } else {
     try {
       const newTokens = await refreshTokenUtil(oldRefreshToken);
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        path: "/users/refreshToken",
+      });
       res.send(newTokens);
     } catch (error) {
       console.log(error);
@@ -204,7 +212,7 @@ const googleAuth = async (req, res, next) => {
     });
     res.cookie("refreshToken", req.user.tokens.refreshToken, {
       httpOnly: true,
-      path: "/refreshToken",
+      path: "/users/refreshToken",
     });
 
     res.status(200).redirect(process.env.FE_URL + "/home");

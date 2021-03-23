@@ -12,7 +12,7 @@ const authenticate = async (user) => {
     console.log(refreshToken);
     user.refreshTokens = user.refreshTokens.concat(refreshToken);
     await user.save();
-    return { token: accessToken, refreshToken };
+    return { accessToken: accessToken, refreshToken: refreshToken };
   } catch (error) {
     console.log(error);
     s;
