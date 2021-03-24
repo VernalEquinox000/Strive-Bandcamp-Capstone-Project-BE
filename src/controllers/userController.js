@@ -263,4 +263,5 @@ module.exports = {
   getUserById,
   googleAuth,
   addProfilePic,
+  cloudMulter,
 };

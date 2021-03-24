@@ -8,6 +8,7 @@ const {
   deleteUser,
   refreshToken,
   googleAuth,
+  cloudMulter,
   addProfilePic,
 } = require("../controllers/userController");
 const { authorize } = require("../middleware/authMiddleware");
