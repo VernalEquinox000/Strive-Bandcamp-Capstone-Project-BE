@@ -48,4 +48,49 @@ const addArticle = async (req, res, next) => {
   }
 };
 
-module.exports = { allArticles, articleById, addArticle };
+//PUT article
+const editArticle = async (req, res, next) => {
+  try {
+    const article = await ArticleModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        runValidators: true, //new Parameters
+        new: true,
+      }
+    );
+    if (article) {
+      res.send(article);
+    } else {
+      const error = new Error(`article not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+//DELETE articles
+const deleteArticle = async (req, res, next) => {
+  try {
+    const article = await ArticleModel.findByIdAndDelete(req.params.id);
+    if (article) {
+      res.send("Deleted");
+    } else {
+      const error = new Error(`article with id ${req.params.id} not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  allArticles,
+  articleById,
+  addArticle,
+  editArticle,
+  deleteArticle,
+};
