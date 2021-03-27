@@ -6,9 +6,15 @@ const UserModel = mongoose.model("User", UserSchema);
 //authentication
 const authenticate = async (user) => {
   try {
-    const accessToken = await generateAccessToken({ _id: user._id });
+    const accessToken = await generateAccessToken({
+      _id: user._id,
+      role: user.role,
+    }); //////check role
     console.log(accessToken);
-    const refreshToken = await generateRefreshToken({ _id: user._id });
+    const refreshToken = await generateRefreshToken({
+      _id: user._id,
+      role: user.role,
+    });
     console.log(refreshToken);
     user.refreshTokens = user.refreshTokens.concat(refreshToken);
     await user.save();
@@ -39,7 +45,7 @@ const verifyAccessToken = (token) =>
       if (err) rej(err);
       res(decoded);
     })
-  );
+  ); //in auth middleware
 
 const generateRefreshToken = (payload) =>
   new Promise((res, rej) =>

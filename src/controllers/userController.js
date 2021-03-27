@@ -19,18 +19,22 @@ const cloudMulter = multer({ storage: cloudStorage });
 //POST Signup
 const signup = async (req, res, next) => {
   try {
-    const newUser = new UserModel(req.body);
-    const { _id } = await newUser.save();
+    const ifUser = await UserModel.findOne({ email: req.body.email });
+    if (!ifUser) {
+      const newUser = new UserModel(req.body);
+      const { _id } = await newUser.save();
+      res.status(201).send(newUser);
+    } else {
+      res.send("Email already in use!");
+    }
     //add cookie
-    res.cookie("refreshToken", token.refreshToken, {
+    /* res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       path: "/users/refreshToken",
     });
     res.status(201).cookie("accessToken", token.token, {
       httpOnly: true,
-    });
-
-    res.status(201).send(_id);
+    }); */
   } catch (error) {
     console.log(error);
     next(error);
@@ -40,24 +44,27 @@ const signup = async (req, res, next) => {
 //POST Login
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body; //change
     const user = await UserModel.findByCredentials(email, password);
     console.log(user);
-    //insert if?
-    const tokens = await authenticate(user);
-    //add cookie
-    res.cookie("refreshToken", tokens.refreshToken, {
-      httpOnly: true,
-      path: "/users/refreshToken",
-    });
-
-    await user.save();
-    res
-      .status(201)
-      .cookie("accessToken", tokens.accessToken, {
+    if (user) {
+      const tokens = await authenticate(user);
+      //add cookie
+      res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
-      })
-      .send(tokens);
+        path: "/users/refreshToken",
+      });
+
+      await user.save();
+      res
+        .status(201)
+        .cookie("accessToken", tokens.accessToken, {
+          httpOnly: true,
+        })
+        .send(tokens);
+    } else {
+      res.send("Email or password not included");
+    }
   } catch (error) {
     console.log(error);
     next(error);
