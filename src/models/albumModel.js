@@ -4,30 +4,27 @@ const Schema = mongoose.Schema;
 const AlbumSchema = new Schema(
   {
     artistName: {
-      type: String,
-      required: "Please enter your band name",
+      type: String, //insert ref to user
+      required: true,
     },
-    username: {
-      type: String,
-      required: "Please enter your username",
+    title: {
+      type: String, //insert ref to user
+      required: true,
     },
-    password: {
-      type: String,
-      required: "Please enter your password",
+    description: {
+      type: String, //insert ref to user
     },
+    albumCover: {
+      type: String, //insert ref to user
+    },
+    releaseDate: {
+      type: Date,
+    },
+    albumSongs: [{ type: String }], //ref to tracks
+    tags: [{ type: String }],
+    //additionaFiles: [{type:String}] CHECK
+    //releaseMail: {type:String} check
     //password must be of 3 chars
-    email: {
-      type: String,
-      trim: true,
-      lowercase: true,
-      required: "Please enter your email",
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "That email address doesn’t look right.",
-      ],
-    },
-
-    //need emailcheck + terms check
   },
   { timestamps: true }
 );

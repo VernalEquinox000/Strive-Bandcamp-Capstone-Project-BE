@@ -20,9 +20,21 @@ const {
 const server = express();
 
 const port = process.env.PORT || 3001;
-server.use(cors());
-server.use(express.json());
 
+const whitelist = [`${process.env.FE_URL}`];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
+server.use(cors(corsOptions));
+server.use(express.json());
 server.use(cookieParser());
 server.use(passport.initialize());
 

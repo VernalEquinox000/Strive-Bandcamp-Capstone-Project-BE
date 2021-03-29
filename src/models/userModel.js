@@ -48,6 +48,9 @@ const UserSchema = new Schema(
     picture: {
       type: String,
     },
+    background: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
