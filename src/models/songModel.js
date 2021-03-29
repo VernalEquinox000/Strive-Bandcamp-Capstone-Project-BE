@@ -8,22 +8,21 @@ const SongSchema = new Schema(
       required: "Please enter song title",
     },
     artistName: {
-      type: String,
-      required: "Please enter artist name",
+      type: String, //add ref to User
     },
     albumName: {
-      type: String,
+      type: String, //add ref to Albums
     },
     duration: {
       type: Number,
     },
-    albumCover: {
-      type: String,
+    price: {
+      type: Number,
     },
-    straming: {
+    songFeatured: {
+      //song which will appear as "cover"
       type: Boolean,
     },
-    download: {},
   },
   { timestamps: true }
 );
