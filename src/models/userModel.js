@@ -8,11 +8,11 @@ const UserSchema = new Schema(
       type: String,
       trim: true,
       lowercase: true,
-      required: true /* "Email address is required",
+      required: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "That email address doesn’t look right.",
-      ], */,
+      ],
     },
     password: {
       type: String,
@@ -25,9 +25,9 @@ const UserSchema = new Schema(
     artistName: {
       type: String,
     },
-    labelName: {
-      type: String,
-    },
+
+    albums: [{ type: Schema.Types.ObjectId, ref: "Album" }],
+
     //need to add URL
     location: {
       type: String,
@@ -37,7 +37,7 @@ const UserSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["fan", "artist", "label"],
+      enum: ["fan", "artist"],
       required: true,
     },
     refreshTokens: [{ type: String }],

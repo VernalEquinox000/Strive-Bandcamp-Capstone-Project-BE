@@ -7,6 +7,10 @@ const SongSchema = new Schema(
       type: String,
       required: "Please enter song title",
     },
+    number: {
+      type: Number,
+      min: [1],
+    },
     artistName: {
       type: String, //add ref to User
     },
@@ -22,6 +26,9 @@ const SongSchema = new Schema(
     songFeatured: {
       //song which will appear as "cover"
       type: Boolean,
+    },
+    audioFile: {
+      type: String,
     },
   },
   { timestamps: true }

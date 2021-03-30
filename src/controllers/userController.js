@@ -140,7 +140,7 @@ const allUsers = async (req, res, next) => {
   }
 };
 
-//GET user profile
+//GET user logged profile
 const meUser = async (req, res, next) => {
   try {
     res.send(req.user);
@@ -149,7 +149,7 @@ const meUser = async (req, res, next) => {
   }
 };
 
-//PUT user
+//PUT update logged user
 const updateUser = (req, res, next) => {
   UserModel.findOneAndUpdate(
     { _id: req.user._id },
@@ -164,7 +164,7 @@ const updateUser = (req, res, next) => {
   );
 };
 
-//DELETE User
+//DELETE logged user
 const deleteUser = (req, res, next) => {
   UserModel.findOneAndDelete({ _id: req.user._id }, (err, user) => {
     if (err) {
@@ -175,42 +175,21 @@ const deleteUser = (req, res, next) => {
   });
 };
 
-//GET single user
-const getSingleUser = async (req, res, next) => {
-  try {
-    const user = await UserModel.findById(req.user._id);
-    /*       need to add.populate([
-      {
-        path: "following",
-        select: ["_id", "username", "picture"],
-      },
-      {
-        path: "followers",
-        select: ["_id", "username", "picture"],
-      },
-    ]); */
-    res.send(user);
-  } catch (error) {
-    error = new Error();
-    error.httpStatusCode = 404;
-    next(error);
-  }
-};
-
 //GET User By Id
 const getUserById = async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.params.userId);
-    /* .populate([
+    const user = await UserModel.findById(req.params.userId).populate([
       {
-        path: "following",
-        select: ["_id", "username", "picture"],
+        path: "albums",
+        select: [
+          "_id",
+          "title",
+          "description",
+          "albumCover, releaseDate, albumSongs, tags",
+        ],
       },
-      {
-        path: "followers",
-        select: ["_id", "username", "picture"],
-      },
-    ]); */
+      //add other path if needed,
+    ]);
     if (user) {
       res.status(200).send(user);
     } else {
@@ -266,7 +245,6 @@ module.exports = {
   updateUser,
   deleteUser,
   refreshToken,
-  getSingleUser,
   getUserById,
   googleAuth,
   addProfilePic,

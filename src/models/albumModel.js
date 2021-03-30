@@ -3,10 +3,12 @@ const Schema = mongoose.Schema;
 
 const AlbumSchema = new Schema(
   {
-    artistName: {
-      type: String, //insert ref to user
+    /* artistName: {
+      type: mongoose.ObjectId,
+      ref: "User",
       required: true,
-    },
+      unique: true,
+    }, */
     title: {
       type: String, //insert ref to user
       required: true,
@@ -20,7 +22,7 @@ const AlbumSchema = new Schema(
     releaseDate: {
       type: Date,
     },
-    albumSongs: [{ type: String }], //ref to tracks
+    albumSongs: [{ type: mongoose.ObjectId, ref: "Song" }], //ref to songs
     tags: [{ type: String }],
     //additionaFiles: [{type:String}] CHECK
     //releaseMail: {type:String} check
