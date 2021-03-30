@@ -4,6 +4,8 @@ const listEndPoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/userRoutes");
+const albumRoutes = require("./routes/albumRoutes");
+const songRoutes = require("./routes/songRoutes");
 const oauth = require("./middleware/oauth");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
@@ -39,6 +41,8 @@ server.use(cookieParser());
 server.use(passport.initialize());
 
 userRoutes(server); //user
+albumRoutes(server);
+songRoutes(server);
 
 //ERROR HANDLERS MIDDLEWARES
 server.use(badRequestHandler);

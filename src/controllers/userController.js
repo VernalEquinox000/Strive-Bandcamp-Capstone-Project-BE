@@ -178,18 +178,29 @@ const deleteUser = (req, res, next) => {
 //GET User By Id
 const getUserById = async (req, res, next) => {
   try {
-    const user = await UserModel.findById(req.params.userId).populate([
-      {
-        path: "albums",
-        select: [
-          "_id",
-          "title",
-          "description",
-          "albumCover, releaseDate, albumSongs, tags",
-        ],
-      },
-      //add other path if needed,
-    ]);
+    const user = await UserModel.findById(req.params.userId)
+      .populate([
+        {
+          path: "albums",
+          select: [
+            "_id",
+            "title",
+            "description",
+            "albumCover",
+            "releaseDate",
+            "albumSongs",
+            "tags",
+          ],
+        },
+        //add other path if needed,
+        ,
+      ])
+      .populate([
+        {
+          path: "albumSongs",
+          select: ["_id", "songName"],
+        },
+      ]);
     if (user) {
       res.status(200).send(user);
     } else {

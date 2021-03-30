@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const SongSchema = require("../models/songModel");
 const SongModel = mongoose.model("Song", SongSchema);
 
-module.exports = {};
-
 const addSong = async (req, res, next) => {
   try {
     const newSong = new SongModel(req.body);
@@ -13,3 +11,5 @@ const addSong = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports = { addSong };
