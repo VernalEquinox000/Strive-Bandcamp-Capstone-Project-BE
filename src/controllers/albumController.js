@@ -99,6 +99,121 @@ const deleteAlbum = async (req, res, next) => {
   }
 };
 
+//GET /albums/:albumId/songs
+const getAllAlbumSongs = async (req, res, next) => {
+  try {
+    const album = await AlbumModel.findById(req.params.albumId, {
+      songs: 1,
+      _id: 0,
+    });
+    res.send(album);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//GET /albums/:albumId/songs/:songId
+const getSingleAlbumSong = async (req, res, next) => {
+  try {
+    const { songs } = await AlbumModel.findOne(
+      {
+        _id: mongoose.Types.ObjectId(req.params.albumId),
+      },
+      {
+        _id: 0,
+        songs: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(req.params.songId) },
+        },
+      }
+    );
+
+    if (songs && songs.length > 0) {
+      res.send(songs[0]);
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+//POST /albums/:albumId/songs
+const addSongToAlbum = async (req, res, next) => {
+  try {
+    const songsAlbum = await AlbumModel.findByIdAndUpdate(req.params.albumId, {
+      $push: {
+        songs: {
+          ...req.body,
+        },
+      },
+    });
+    res.status(201).send(songsAlbum);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//PUT /albums/:albumId/songs/:songId
+const editAlbumSong = async (req, res, next) => {
+  try {
+    const { songs } = await AlbumModel.findOne(
+      {
+        _id: mongoose.Types.ObjectId(req.params.albumId),
+      },
+      {
+        _id: 0,
+        songs: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(req.params.songId) },
+        },
+      }
+    );
+    console.log(songs);
+    if (songs && songs.length > 0) {
+      const songToReplace = { ...songs[0].toObject(), ...req.body };
+      console.log(songToReplace);
+      mongoose.set("useFindAndModify", false);
+      const modifiedSong = await AlbumModel.findOneAndUpdate(
+        {
+          _id: mongoose.Types.ObjectId(req.params.albumId),
+          "songs._id": mongoose.Types.ObjectId(req.params.songId),
+        },
+        { $set: { "songs.$": songToReplace } },
+        {
+          runValidators: true,
+          new: true,
+        }
+      );
+      console.log(modifiedSong);
+      res.send(modifiedSong);
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+const deleteAlbumSong = async (req, res, next) => {
+  try {
+    const modifiedSong = await AlbumModel.findByIdAndUpdate(
+      req.params.albumId,
+      {
+        $pull: {
+          songs: { _id: mongoose.Types.ObjectId(req.params.songId) },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(modifiedSong);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 module.exports = {
   addAlbum,
   getAllAlbums,
@@ -106,4 +221,9 @@ module.exports = {
   getSingleAlbum,
   editAlbum,
   deleteAlbum,
+  addSongToAlbum,
+  getAllAlbumSongs,
+  getSingleAlbumSong,
+  editAlbumSong,
+  deleteAlbumSong,
 };

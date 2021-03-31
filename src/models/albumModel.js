@@ -9,23 +9,42 @@ const AlbumSchema = new Schema(
       required: true,
       unique: true,
     }, */
-    title: {
+    albumTitle: {
       type: String, //insert ref to user
       required: true,
     },
     description: {
       type: String, //insert ref to user
     },
-    albumCover: {
+    cover: {
       type: String, //insert ref to user
     },
     releaseDate: {
       type: Date,
     },
-    albumSongs: [
+    songs: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Song",
+        songTitle: {
+          type: String,
+          required: "Please enter song title",
+        },
+        number: {
+          type: Number,
+          min: [1],
+        },
+        duration: {
+          type: Number,
+        },
+        price: {
+          type: Number,
+        },
+        songFeatured: {
+          //song which will appear as "cover"
+          type: Boolean,
+        },
+        audioFile: {
+          type: String,
+        },
       },
     ], //ref to songs
     tags: [{ type: String }],
