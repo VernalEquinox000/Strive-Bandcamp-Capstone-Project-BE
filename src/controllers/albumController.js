@@ -1,6 +1,28 @@
 const mongoose = require("mongoose");
 const AlbumSchema = require("../models/albumModel");
 const AlbumModel = mongoose.model("Album", AlbumSchema);
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../middleware/cloudinary");
+
+//
+const cloudStorageCover = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "albumCovers",
+  },
+});
+
+const cloudMulterCover = multer({ storage: cloudStorageCover });
+
+const cloudStorageFile = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "albumCovers",
+  },
+});
+
+const cloudMulterFile = multer({ storage: cloudStorageFile });
 
 //POST album
 const addAlbum = async (req, res, next) => {
@@ -214,6 +236,40 @@ const deleteAlbumSong = async (req, res, next) => {
   }
 };
 
+const addAlbumCover = async (req, res, next) => {
+  try {
+    const addPicture = await AlbumModel.findByIdAndUpdate(req._id, {
+      $set: {
+        cover: req.file.path,
+      },
+    });
+    if (addPicture) {
+      res.status(200).send(addPicture);
+    } else {
+      res.send("Album not found!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const addSongFile = async (req, res, next) => {
+  try {
+    const addFile = await AlbumModel.findByIdAndUpdate(req._id, {
+      $set: {
+        albumFile: req.file.path,
+      },
+    });
+    if (addFile) {
+      res.status(200).send(addFile);
+    } else {
+      res.send("File not found!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   addAlbum,
   getAllAlbums,
@@ -226,4 +282,8 @@ module.exports = {
   getSingleAlbumSong,
   editAlbumSong,
   deleteAlbumSong,
+  cloudMulterCover,
+  addAlbumCover,
+  cloudMulterFile,
+  addSongFile,
 };

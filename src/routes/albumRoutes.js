@@ -10,6 +10,10 @@ const {
   getSingleAlbumSong,
   editAlbumSong,
   deleteAlbumSong,
+  cloudMulterCover,
+  addAlbumCover,
+  cloudMulterFile,
+  addSongFile,
 } = require("../controllers/albumController");
 
 const routes = (app) => {
@@ -28,6 +32,12 @@ const routes = (app) => {
     .get(getSingleAlbumSong)
     .put(editAlbumSong)
     .delete(deleteAlbumSong);
+  app
+    .route("/albums/cover")
+    .post(cloudMulterCover.single("picture"), addAlbumCover);
+  app
+    .route("/albums/:albumId/songs/song:songId/file")
+    .post(cloudMulterFile.single("albumCovers"), addSongFile);
 };
 
 module.exports = routes;
