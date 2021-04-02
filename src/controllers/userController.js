@@ -232,7 +232,7 @@ const googleAuth = async (req, res, next) => {
 
 const addProfilePic = async (req, res, next) => {
   try {
-    const addPicture = await UserModel.findByIdAndUpdate(req._id, {
+    const addPicture = await UserModel.findByIdAndUpdate(req.user._id, {
       $set: {
         picture: req.file.path,
       },

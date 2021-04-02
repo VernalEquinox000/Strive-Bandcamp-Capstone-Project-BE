@@ -26,7 +26,7 @@ const routes = (app) => {
     .put(authorize, updateUser)
     .delete(authorize, deleteUser);
   app
-    .route("/users/profilePic")
+    .route("/users/me/profilePic")
     .post(authorize, cloudMulter.single("picture"), addProfilePic);
   app.route("/users/refreshToken").post(refreshToken);
   app

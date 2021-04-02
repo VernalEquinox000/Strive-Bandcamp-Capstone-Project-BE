@@ -6,23 +6,23 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
 
 //
-const cloudStorageCover = new CloudinaryStorage({
+const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "albumCovers",
   },
 });
 
-const cloudMulterCover = multer({ storage: cloudStorageCover });
+const cloudMulter = multer({ storage: cloudStorage });
 
-const cloudStorageFile = new CloudinaryStorage({
+/* const cloudStorageFile = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "albumCovers",
   },
 });
 
-const cloudMulterFile = multer({ storage: cloudStorageFile });
+const cloudMulterFile = multer({ storage: cloudStorageFile }); */
 
 //POST album
 const addAlbum = async (req, res, next) => {
@@ -238,7 +238,7 @@ const deleteAlbumSong = async (req, res, next) => {
 
 const addAlbumCover = async (req, res, next) => {
   try {
-    const addPicture = await AlbumModel.findByIdAndUpdate(req._id, {
+    const addPicture = await AlbumModel.findByIdAndUpdate(req.params.albumId, {
       $set: {
         cover: req.file.path,
       },
@@ -253,7 +253,7 @@ const addAlbumCover = async (req, res, next) => {
   }
 };
 
-const addSongFile = async (req, res, next) => {
+/* const addSongFile = async (req, res, next) => {
   try {
     const addFile = await AlbumModel.findByIdAndUpdate(req._id, {
       $set: {
@@ -269,7 +269,7 @@ const addSongFile = async (req, res, next) => {
     console.log(error);
   }
 };
-
+ */
 module.exports = {
   addAlbum,
   getAllAlbums,
@@ -282,8 +282,8 @@ module.exports = {
   getSingleAlbumSong,
   editAlbumSong,
   deleteAlbumSong,
-  cloudMulterCover,
+  cloudMulter,
   addAlbumCover,
-  cloudMulterFile,
-  addSongFile,
+  /* cloudMulterFile,
+  addSongFile, */
 };
