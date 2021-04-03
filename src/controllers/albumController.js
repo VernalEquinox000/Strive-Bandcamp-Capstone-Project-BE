@@ -6,23 +6,25 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
 
 //
-const cloudStorage = new CloudinaryStorage({
+const cloudStorageCovers = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "albumCovers",
   },
 });
 
-const cloudMulter = multer({ storage: cloudStorage });
+const cloudMulterCovers = multer({ storage: cloudStorageCovers });
 
-/* const cloudStorageFile = new CloudinaryStorage({
+const cloudStorageSongs = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "albumCovers",
+    folder: "albumFiles",
+    resource_type: "auto",
+    allowed_formats: ["wav", "mp3", "flac", "m4a"],
   },
 });
 
-const cloudMulterFile = multer({ storage: cloudStorageFile }); */
+const cloudMulterSongs = multer({ storage: cloudStorageSongs });
 
 //POST album
 const addAlbum = async (req, res, next) => {
@@ -68,7 +70,7 @@ const getAlbumQuery = async (req, res, next) => {
 const getSingleAlbum = async (req, res, next) => {
   try {
     const id = req.params.albumId;
-    const album = await AlbumModel.findById(albumId).populate("albumSongs");
+    const album = await AlbumModel.findById(id).populate("albumSongs");
     if (album) {
       res.send(album);
     } else {
@@ -85,14 +87,11 @@ const getSingleAlbum = async (req, res, next) => {
 //PUT albums/:albumId
 const editAlbum = async (req, res, next) => {
   try {
-    const album = await AlbumModel.findByIdAndUpdate(
-      req.params.albumId,
-      req.body,
-      {
-        runValidators: true, //new Parameters
-        new: true,
-      }
-    );
+    const id = req.params.albumId;
+    const album = await AlbumModel.findByIdAndUpdate(id, req.body, {
+      runValidators: true, //new Parameters
+      new: true,
+    });
     if (album) {
       res.send(album);
     } else {
@@ -108,7 +107,8 @@ const editAlbum = async (req, res, next) => {
 //DELETE albums/:albumId
 const deleteAlbum = async (req, res, next) => {
   try {
-    const album = await AlbumModel.findByIdAndDelete(req.params.albumId);
+    const id = req.params.albumId;
+    const album = await AlbumModel.findByIdAndDelete(id);
     if (album) {
       res.send("Deleted");
     } else {
@@ -124,7 +124,8 @@ const deleteAlbum = async (req, res, next) => {
 //GET /albums/:albumId/songs
 const getAllAlbumSongs = async (req, res, next) => {
   try {
-    const album = await AlbumModel.findById(req.params.albumId, {
+    const id = req.params.albumId;
+    const album = await AlbumModel.findById(id, {
       songs: 1,
       _id: 0,
     });
@@ -136,15 +137,17 @@ const getAllAlbumSongs = async (req, res, next) => {
 
 //GET /albums/:albumId/songs/:songId
 const getSingleAlbumSong = async (req, res, next) => {
+  const albumId = req.params.albumId;
+  const songId = req.params.songId;
   try {
     const { songs } = await AlbumModel.findOne(
       {
-        _id: mongoose.Types.ObjectId(req.params.albumId),
+        _id: mongoose.Types.ObjectId(albumId),
       },
       {
         _id: 0,
         songs: {
-          $elemMatch: { _id: mongoose.Types.ObjectId(req.params.songId) },
+          $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
         },
       }
     );
@@ -199,7 +202,9 @@ const editAlbumSong = async (req, res, next) => {
           _id: mongoose.Types.ObjectId(req.params.albumId),
           "songs._id": mongoose.Types.ObjectId(req.params.songId),
         },
-        { $set: { "songs.$": songToReplace } },
+        {
+          $set: { "songs.$": songToReplace },
+        },
         {
           runValidators: true,
           new: true,
@@ -238,7 +243,8 @@ const deleteAlbumSong = async (req, res, next) => {
 
 const addAlbumCover = async (req, res, next) => {
   try {
-    const addPicture = await AlbumModel.findByIdAndUpdate(req.params.albumId, {
+    const id = req.params.albumId;
+    const addPicture = await AlbumModel.findByIdAndUpdate(id, {
       $set: {
         cover: req.file.path,
       },
@@ -253,23 +259,70 @@ const addAlbumCover = async (req, res, next) => {
   }
 };
 
-/* const addSongFile = async (req, res, next) => {
-  try {
-    const addFile = await AlbumModel.findByIdAndUpdate(req._id, {
-      $set: {
-        albumFile: req.file.path,
+const addSongFile = async (req, res, next) => {
+  /* try {
+    const id = req.params.albumId;
+    const addPicture = await AlbumModel.findByIdAndUpdate(id, {
+      songs: {
+        $set: {
+          audioFile: req.file.path,
+        },
       },
     });
-    if (addFile) {
-      res.status(200).send(addFile);
+    if (addPicture) {
+      res.status(200).send(addPicture);
     } else {
-      res.send("File not found!");
+      res.send("Album not found!");
     }
   } catch (error) {
     console.log(error);
   }
+}; */
+  try {
+    const albumId = req.params.albumId;
+    const songId = req.params.songId;
+    /* const { songs } = await AlbumModel.findOne(
+      {
+        _id: mongoose.Types.ObjectId(albumId),
+      },
+      {
+        _id: 0,
+        songs: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
+        },
+      }
+    );
+    console.log(songs);
+    if (songs && songs.length > 0) {
+      const songToReplace = { ...songs[0].toObject(), ...req.file.path };
+      console.log(songToReplace);
+      mongoose.set("useFindAndModify", false); */
+    const modifiedSong = await AlbumModel.findOneAndUpdate(
+      {
+        _id: mongoose.Types.ObjectId(albumId),
+        //"songs._id": mongoose.Types.ObjectId(songId),
+      },
+      {
+        songs: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
+        },
+      },
+      {
+        songs: {
+          $set: { audioFile: req.file.path },
+        },
+      }
+    );
+    console.log(modifiedSong);
+    res.send(modifiedSong);
+    /* } else {
+      res.send("File not found!");
+    } */
+  } catch (error) {
+    console.log(error);
+  }
 };
- */
+
 module.exports = {
   addAlbum,
   getAllAlbums,
@@ -282,8 +335,8 @@ module.exports = {
   getSingleAlbumSong,
   editAlbumSong,
   deleteAlbumSong,
-  cloudMulter,
+  cloudMulterCovers,
   addAlbumCover,
-  /* cloudMulterFile,
-  addSongFile, */
+  cloudMulterSongs,
+  addSongFile,
 };

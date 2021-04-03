@@ -10,10 +10,11 @@ const {
   getSingleAlbumSong,
   editAlbumSong,
   deleteAlbumSong,
-  cloudMulter,
+  cloudMulterCovers,
   addAlbumCover,
-  /* cloudMulterFile,
-  addSongFile, */
+  cloudMulterSongs,
+  addSongFile,
+  findSong,
 } = require("../controllers/albumController");
 
 const routes = (app) => {
@@ -26,7 +27,7 @@ const routes = (app) => {
   app
     .route("/albums/:albumId/songs")
     .post(addSongToAlbum)
-    .get(getSingleAlbumSong);
+    .get(getAllAlbumSongs);
   app
     .route("/albums/:albumId/songs/:songId")
     .get(getSingleAlbumSong)
@@ -34,10 +35,10 @@ const routes = (app) => {
     .delete(deleteAlbumSong);
   app
     .route("/albums/:albumId/albumCover")
-    .post(cloudMulter.single("cover"), addAlbumCover);
-  /*   app
-    .route("/albums/:albumId/songs/song:songId/file")
-    .post(cloudMulterFile.single("albumCovers"), addSongFile); */
+    .post(cloudMulterCovers.single("cover"), addAlbumCover);
+  app
+    .route("/albums/:albumId/songs/:songId/audioFile")
+    .post(cloudMulterSongs.single("audioFile"), addSongFile);
 };
 
 module.exports = routes;
