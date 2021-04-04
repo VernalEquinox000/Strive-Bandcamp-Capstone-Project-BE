@@ -11,7 +11,7 @@ const SongSchema = new Schema(
       type: Number,
       min: [1],
     },
-    artistName: {
+    artistId: {
       type: String, //add ref to User
     },
     duration: {

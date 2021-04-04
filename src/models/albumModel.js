@@ -9,7 +9,7 @@ const AlbumSchema = new Schema(
       required: true,
       unique: true,
     }, */
-    albumTitle: {
+    title: {
       type: String, //insert ref to user
       required: true,
     },
@@ -21,8 +21,13 @@ const AlbumSchema = new Schema(
     },
     releaseDate: {
       type: Date,
-    },
-    songs: [
+    }, //ref to songs
+    /* songs: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Song",
+      },
+    ], */ songs: [
       {
         songTitle: {
           type: String,
@@ -31,6 +36,9 @@ const AlbumSchema = new Schema(
         number: {
           type: Number,
           min: [1],
+        },
+        artistId: {
+          type: String, //add ref to User
         },
         duration: {
           type: Number,
@@ -46,11 +54,14 @@ const AlbumSchema = new Schema(
           type: String,
         },
       },
-    ], //ref to songs
+    ],
     tags: [{ type: String }],
-    //additionaFiles: [{type:String}] CHECK
+    extraFiles: [{ type: String }],
     //releaseMail: {type:String} check
-    //password must be of 3 chars
+
+    artistId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

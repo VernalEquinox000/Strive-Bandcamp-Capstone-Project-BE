@@ -281,7 +281,7 @@ const addSongFile = async (req, res, next) => {
   try {
     const albumId = req.params.albumId;
     const songId = req.params.songId;
-    /* const { songs } = await AlbumModel.findOne(
+    const { songs } = await AlbumModel.findOne(
       {
         _id: mongoose.Types.ObjectId(albumId),
       },
@@ -296,28 +296,29 @@ const addSongFile = async (req, res, next) => {
     if (songs && songs.length > 0) {
       const songToReplace = { ...songs[0].toObject(), ...req.file.path };
       console.log(songToReplace);
-      mongoose.set("useFindAndModify", false); */
+
+      const fileToSong = await AlbumModel.findOneAndUpdate(
+        { _id: albumId, "songs._id": songId },
+        { $set: { "songs.$": { audioFile: req.file.path } } }
+      ).exec();
+      /* mongoose.set("useFindAndModify", false);
     const modifiedSong = await AlbumModel.findOneAndUpdate(
       {
         _id: mongoose.Types.ObjectId(albumId),
-        //"songs._id": mongoose.Types.ObjectId(songId),
+        "songs._id": mongoose.Types.ObjectId(songId),
       },
       {
         songs: {
           $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
-        },
-      },
-      {
-        songs: {
           $set: { audioFile: req.file.path },
         },
       }
     );
-    console.log(modifiedSong);
-    res.send(modifiedSong);
-    /* } else {
+    console.log(modifiedSong);*/
+      res.send(fileToSong);
+    } else {
       res.send("File not found!");
-    } */
+    }
   } catch (error) {
     console.log(error);
   }

@@ -12,4 +12,96 @@ const addSong = async (req, res, next) => {
   }
 };
 
-module.exports = { addSong };
+//GET all songs
+const getAllSongs = async (req, res, next) => {
+  try {
+    const songs = await SongModel.find();
+    //also findOne or findById
+    res.send(songs);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//GET songs query
+const getSongsQuery = async (req, res, next) => {
+  try {
+    const query = q2m(req.query);
+    console.log(query);
+    const totsongs = await SongModel.countDocuments(query.criteria);
+
+    const songs = await SongModel.find(query.criteria, query.options.fields)
+      .skip(query.options.skip)
+      .limit(query.options.limit)
+      .sort(query.options.sort);
+    //.populate("songs", { _id: 0, title: 1 });
+    res.send({ links: query.links("/songs", totSongs), songs });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+//GET /songs/:songId
+const getSingleSong = async (req, res, next) => {
+  try {
+    const id = req.params.songId;
+    const song = await SongModel.findById(id);
+    if (song) {
+      res.send(song);
+    } else {
+      const error = new Error();
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    console.log(error);
+    next("While reading songs list a problem occurred!");
+  }
+};
+
+//PUT songs/:songId
+const editSong = async (req, res, next) => {
+  try {
+    const id = req.params.songId;
+    const song = await SongModel.findByIdAndUpdate(id, req.body, {
+      runValidators: true, //new Parameters
+      new: true,
+    });
+    if (song) {
+      res.send(song);
+    } else {
+      const error = new Error(`song with id ${req.params.songId} not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+//DELETE songs/:songId
+const deleteSong = async (req, res, next) => {
+  try {
+    const id = req.params.songId;
+    const song = await SongModel.findByIdAndDelete(id);
+    if (song) {
+      res.send("Deleted");
+    } else {
+      const error = new Error(`song with id ${req.params.songId} not found`);
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  addSong,
+  getAllSongs,
+  getSongsQuery,
+  getSingleSong,
+  editSong,
+  deleteSong,
+};
