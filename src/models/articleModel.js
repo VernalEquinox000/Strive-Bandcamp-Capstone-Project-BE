@@ -17,6 +17,11 @@ const ArticleSchema = new Schema(
     author: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      default: "Bandcamp",
+    },
+    artistId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     cover: {
       type: String,

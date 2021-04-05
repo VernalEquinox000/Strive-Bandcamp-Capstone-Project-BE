@@ -230,11 +230,48 @@ const googleAuth = async (req, res, next) => {
   }
 };
 
+//POST Profile pic
 const addProfilePic = async (req, res, next) => {
   try {
     const addPicture = await UserModel.findByIdAndUpdate(req.user._id, {
       $set: {
-        picture: req.file.path,
+        profilePic: req.file.path,
+      },
+    });
+    if (addPicture) {
+      res.status(200).send(addPicture);
+    } else {
+      res.send("User not found!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//POST Background pic
+const addBackgroundPic = async (req, res, next) => {
+  try {
+    const addPicture = await UserModel.findByIdAndUpdate(req.user._id, {
+      $set: {
+        backgroundPic: req.file.path,
+      },
+    });
+    if (addPicture) {
+      res.status(200).send(addPicture);
+    } else {
+      res.send("User not found!");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//POST Header Pic
+const addHeaderPic = async (req, res, next) => {
+  try {
+    const addPicture = await UserModel.findByIdAndUpdate(req.user._id, {
+      $set: {
+        headerPic: req.file.path,
       },
     });
     if (addPicture) {
@@ -259,5 +296,7 @@ module.exports = {
   getUserById,
   googleAuth,
   addProfilePic,
+  addBackgroundPic,
+  addHeaderPic,
   cloudMulter,
 };

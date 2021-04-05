@@ -6,6 +6,7 @@ const UserSchema = new Schema(
   {
     email: {
       type: String,
+      unique: true,
       trim: true,
       lowercase: true,
       required: true,
@@ -32,9 +33,11 @@ const UserSchema = new Schema(
     location: {
       type: String,
     },
-    url: {
-      type: String,
-    },
+    url: [
+      {
+        type: String,
+      },
+    ],
     role: {
       type: String,
       enum: ["fan", "artist"],
@@ -45,10 +48,16 @@ const UserSchema = new Schema(
     googleId: {
       type: String,
     },
-    picture: {
+    profilePic: {
       type: String,
     },
-    background: {
+    backgroundPic: {
+      type: String,
+    },
+    headerPic: {
+      type: String,
+    },
+    description: {
       type: String,
     },
   },
@@ -60,7 +69,7 @@ UserSchema.methods.toJSON = function () {
   const userObject = user.toObject();
 
   delete userObject.password;
-  delete userObject.__V;
+  delete userObject.__v;
   delete userObject.refreshTokens;
 
   return userObject;
