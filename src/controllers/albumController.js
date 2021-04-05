@@ -296,10 +296,11 @@ const addSongFile = async (req, res, next) => {
     if (songs && songs.length > 0) {
       const songToReplace = { ...songs[0].toObject(), ...req.file.path };
       console.log(songToReplace);
-
+      mongoose.set("useFindAndModify", false);
       const fileToSong = await AlbumModel.findOneAndUpdate(
         { _id: albumId, "songs._id": songId },
-        { $set: { "songs.$": { audioFile: req.file.path } } }
+        { $set: { "songs.$.audioFile": req.file.path } },
+        { new: true }
       ).exec();
       /* mongoose.set("useFindAndModify", false);
     const modifiedSong = await AlbumModel.findOneAndUpdate(
