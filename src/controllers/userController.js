@@ -143,6 +143,8 @@ const allUsers = async (req, res, next) => {
 //GET user logged profile
 const meUser = async (req, res, next) => {
   try {
+    const findMe = UserModel.findOne({ id: req.user._id });
+    console.log(findMe);
     res.send(req.user);
   } catch (error) {
     next(error);
@@ -185,9 +187,9 @@ const getUserById = async (req, res, next) => {
           "_id",
           "title",
           "description",
-          "albumCover",
+          "cover",
           "releaseDate",
-          "albumSongs",
+          "songs",
           "tags",
         ],
       },

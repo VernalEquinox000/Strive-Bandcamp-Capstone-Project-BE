@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const SongSchema = new Schema(
   {
-    songName: {
+    songTitle: {
       type: String,
       required: "Please enter song title",
     },
