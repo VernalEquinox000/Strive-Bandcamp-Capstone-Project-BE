@@ -97,6 +97,29 @@ const deleteSong = async (req, res, next) => {
   }
 };
 
+//DOWNLOAD song
+const downloadSong = async (req, res, next) => {
+  try {
+    const fs = require("fs");
+    const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
+
+    const ffmpeg = createFFmpeg({ log: true });
+
+    (async () => {
+      await ffmpeg.load();
+      ffmpeg.FS("writeFile", "test.wav", await fetchFile("./test.wav"));
+      await ffmpeg.run("-i", "test.avi", "test.mp4");
+      await fs.promises.writeFile(
+        "./test.mp4",
+        ffmpeg.FS("readFile", "test.mp4")
+      );
+      process.exit(0);
+    })();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addSong,
   getAllSongs,

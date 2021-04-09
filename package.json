@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ffmpeg/core": "^0.8.5",
+    "@ffmpeg/ffmpeg": "^0.9.7",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.25.0",
@@ -19,6 +21,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-list-endpoints": "^5.0.0",
+    "fs": "0.0.1-security",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.4",
