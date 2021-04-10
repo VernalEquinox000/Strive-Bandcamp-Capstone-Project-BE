@@ -5,7 +5,8 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
 //new below
-const CloudmersiveValidateApiClient = require("cloudmersive-validate-api-client");
+const CloudmersiveVideoApiClient = require("cloudmersive-video-api-client");
+const defaultClient = CloudmersiveVideoApiClient.ApiClient.instance;
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -328,25 +329,28 @@ const addSongFile = async (req, res, next) => {
 };
 
 const convertAudio = async (req, res, next) => {
-  const defaultClient = CloudmersiveValidateApiClient.ApiClient.instance;
-
   // Configure API key authorization: Apikey
   const Apikey = defaultClient.authentications["Apikey"];
   Apikey.apiKey = process.env.CM_API_KEY;
 
-  const api = new CloudmersiveValidateApiClient.DomainApi();
+  var apiInstance = new CloudmersiveVideoApiClient.AudioApi();
 
-  const domain = "cloudmersive.com"; // {String} Domain name to check, for example \"cloudmersive.com\".  The input is a string so be sure to enclose it in double-quotes.
+  var opts = {
+    //inputFile: Buffer.from(fs.readFileSync("C:\\temp\\inputfile").buffer), // File | Input file to perform the operation on.
+    fileUrl:
+      "https://res.cloudinary.com/vernalequinox000/video/upload/v1617778299/albumFiles/vqlcgsjycwuxfz6oek1g.wav", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
+    bitRate: 320, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
+  };
 
-  const callback = function (error, data, response) {
+  var callback = function (error, data, response) {
     if (error) {
       console.error(error);
     } else {
       console.log("API called successfully. Returned data: " + data);
     }
   };
-
-  api.domainCheck(domain, callback);
+  const file = apiInstance.audioConvertToMp3(opts, callback);
+  res.send(file);
 };
 
 module.exports = {
@@ -365,4 +369,5 @@ module.exports = {
   addAlbumCover,
   cloudMulterSongs,
   addSongFile,
+  convertAudio,
 };
