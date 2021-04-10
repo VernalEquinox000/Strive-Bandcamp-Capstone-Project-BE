@@ -4,6 +4,8 @@ const AlbumModel = mongoose.model("Album", AlbumSchema);
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
+//new below
+const CloudmersiveValidateApiClient = require("cloudmersive-validate-api-client");
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -323,6 +325,28 @@ const addSongFile = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const convertAudio = async (req, res, next) => {
+  const defaultClient = CloudmersiveValidateApiClient.ApiClient.instance;
+
+  // Configure API key authorization: Apikey
+  const Apikey = defaultClient.authentications["Apikey"];
+  Apikey.apiKey = process.env.CM_API_KEY;
+
+  const api = new CloudmersiveValidateApiClient.DomainApi();
+
+  const domain = "cloudmersive.com"; // {String} Domain name to check, for example \"cloudmersive.com\".  The input is a string so be sure to enclose it in double-quotes.
+
+  const callback = function (error, data, response) {
+    if (error) {
+      console.error(error);
+    } else {
+      console.log("API called successfully. Returned data: " + data);
+    }
+  };
+
+  api.domainCheck(domain, callback);
 };
 
 module.exports = {
