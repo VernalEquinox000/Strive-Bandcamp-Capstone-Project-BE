@@ -30,7 +30,12 @@ const UserSchema = new Schema(
     albums: [{ type: Schema.Types.ObjectId, ref: "Album" }],
 
     //need to add URL
-    location: {
+    address: { type: String },
+
+    city: {
+      type: String,
+    },
+    state: {
       type: String,
     },
     url: [

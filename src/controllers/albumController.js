@@ -7,6 +7,7 @@ const cloudinary = require("../middleware/cloudinary");
 //new below
 const CloudmersiveVideoApiClient = require("cloudmersive-video-api-client");
 const defaultClient = CloudmersiveVideoApiClient.ApiClient.instance;
+const fs = require("fs");
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -336,9 +337,10 @@ const convertAudio = async (req, res, next) => {
   var apiInstance = new CloudmersiveVideoApiClient.AudioApi();
 
   var opts = {
-    //inputFile: Buffer.from(fs.readFileSync("C:\\temp\\inputfile").buffer), // File | Input file to perform the operation on.
-    fileUrl:
-      "https://res.cloudinary.com/vernalequinox000/video/upload/v1617778299/albumFiles/vqlcgsjycwuxfz6oek1g.wav", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
+    inputFile: Buffer.from(
+      fs.readFileSync("/Users/pierdomenicoapruzzese/5.wav").buffer
+    ), // File | Input file to perform the operation on.
+    fileUrl: "", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
     bitRate: 320, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
   };
 
@@ -347,10 +349,12 @@ const convertAudio = async (req, res, next) => {
       console.error(error);
     } else {
       console.log("API called successfully. Returned data: " + data);
+      const response = data;
+      return response;
     }
   };
-  const file = apiInstance.audioConvertToMp3(opts, callback);
-  res.send(file);
+  apiInstance.audioConvertToMp3(opts, callback);
+  res.send("");
 };
 
 module.exports = {
