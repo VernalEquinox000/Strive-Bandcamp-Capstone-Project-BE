@@ -353,8 +353,8 @@ const convertAudio = async (req, res, next) => {
       return response;
     }
   };
-  apiInstance.audioConvertToMp3(opts, callback);
-  res.send("");
+  const file = apiInstance.audioConvertToMp3(opts, callback);
+  res.send(file);
 };
 
 module.exports = {
