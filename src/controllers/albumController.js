@@ -339,22 +339,24 @@ const convertAudio = async (req, res, next) => {
   var opts = {
     inputFile: Buffer.from(
       fs.readFileSync("/Users/pierdomenicoapruzzese/5.wav").buffer
-    ), // File | Input file to perform the operation on.
+    ),
+    // File | Input file to perform the operation on.
     fileUrl: "", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
-    bitRate: 320, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
+    bitRate: 192, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
   };
 
   var callback = function (error, data, response) {
     if (error) {
-      console.error(error);
+      console.log(error);
     } else {
       console.log("API called successfully. Returned data: " + data);
       const response = data;
+      console.log(response);
+      res.send(response);
       return response;
     }
   };
-  const file = apiInstance.audioConvertToMp3(opts, callback);
-  res.send(file);
+  apiInstance.audioConvertToMp3(opts, callback);
 };
 
 module.exports = {
