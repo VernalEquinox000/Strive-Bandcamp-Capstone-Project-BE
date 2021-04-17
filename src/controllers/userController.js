@@ -28,13 +28,13 @@ const signup = async (req, res, next) => {
       res.send("Email already in use!");
     }
     //add cookie
-    /* res.cookie("refreshToken", token.refreshToken, {
+    res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       path: "/users/refreshToken",
     });
-    res.status(201).cookie("accessToken", token.token, {
+    res.status(201).cookie("accessToken", token.accessToken, {
       httpOnly: true,
-    }); */
+    });
   } catch (error) {
     console.log(error);
     next(error);

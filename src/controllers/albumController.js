@@ -352,7 +352,6 @@ const convertAudio = async (req, res, next) => {
       console.log("API called successfully. Returned data: " + data);
       const response = data;
       console.log(response);
-      res.send(response);
       return response;
     }
   };

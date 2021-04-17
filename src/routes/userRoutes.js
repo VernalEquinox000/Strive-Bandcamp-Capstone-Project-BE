@@ -7,7 +7,7 @@ const {
   updateUser,
   deleteUser,
   refreshToken,
-  googleAuth,
+  //googleAuth,
   cloudMulter,
   addProfilePic,
   addHeaderPic,
@@ -38,10 +38,10 @@ const routes = (app) => {
     .post(authorize, cloudMulter.single("backgroundPic"), addProfilePic);
 
   app.route("/users/refreshToken").post(refreshToken);
-  app
+  /*  app
     .route("/googleLogin")
     .get(passport.authenticate("google", { scope: ["profile", "email"] }));
-  app.route("/googleRedirect").get(passport.authenticate("google"), googleAuth);
+  app.route("/googleRedirect").get(passport.authenticate("google"), googleAuth); */
   app.route("/users/:userId").get(getUserById);
 };
 

@@ -97,7 +97,7 @@ const refreshTokenUtil = async (oldRefreshToken) => {
   }
 };
 
-const googleAuthenticate = async (req, res, next) => {
+/* const googleAuthenticate = async (req, res, next) => {
   try {
     res.cookie("accessToken", req.user.tokens.token, {
       httpOnly: true,
@@ -111,11 +111,11 @@ const googleAuthenticate = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}; */
 
 module.exports = {
   authenticate,
   verifyAccessToken,
   refreshTokenUtil,
-  googleAuthenticate,
+  //googleAuthenticate,
 };
