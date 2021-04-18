@@ -8,6 +8,7 @@ const cloudinary = require("../middleware/cloudinary");
 const CloudmersiveVideoApiClient = require("cloudmersive-video-api-client");
 const defaultClient = CloudmersiveVideoApiClient.ApiClient.instance;
 const fs = require("fs");
+const { response } = require("express");
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -264,24 +265,6 @@ const addAlbumCover = async (req, res, next) => {
 };
 
 const addSongFile = async (req, res, next) => {
-  /* try {
-    const id = req.params.albumId;
-    const addPicture = await AlbumModel.findByIdAndUpdate(id, {
-      songs: {
-        $set: {
-          audioFile: req.file.path,
-        },
-      },
-    });
-    if (addPicture) {
-      res.status(200).send(addPicture);
-    } else {
-      res.send("Album not found!");
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}; */
   try {
     const albumId = req.params.albumId;
     const songId = req.params.songId;
@@ -337,12 +320,8 @@ const convertAudio = async (req, res, next) => {
   var apiInstance = new CloudmersiveVideoApiClient.AudioApi();
 
   var opts = {
-    inputFile: Buffer.from(
-      fs.readFileSync("/Users/pierdomenicoapruzzese/5.wav").buffer
-    ),
-    // File | Input file to perform the operation on.
-    fileUrl: "", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
-    bitRate: 192, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
+    fileUrl: "https://www.dropbox.com/s/jbrnoxqlb8izem6/Amb4.wav", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
+    bitRate: 48, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
   };
 
   var callback = function (error, data, response) {
@@ -355,7 +334,7 @@ const convertAudio = async (req, res, next) => {
       return response;
     }
   };
-  apiInstance.audioConvertToMp3(opts, callback);
+  apiInstance.audioConvertToM4a(opts, callback);
 };
 
 module.exports = {

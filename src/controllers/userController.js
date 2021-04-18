@@ -102,19 +102,24 @@ const logoutAll = async (req, res, next) => {
 //POST Refresh Token
 const refreshToken = async (req, res, next) => {
   console.log(req.cookies);
-  const oldRefreshToken = req.body.refreshToken;
+  const oldRefreshToken = req.cookies.refreshToken;
   if (!oldRefreshToken) {
     const err = new Error("Refresh token missing");
     err.httpStatusCode = 400;
     next(err);
   } else {
     try {
-      const newTokens = await refreshTokenUtil(oldRefreshToken);
+      const { accessToken, refreshToken } = await refreshTokenUtil(
+        oldRefreshToken
+      );
       res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
       });
-      res.send(newTokens);
+      res.send("tokens are refreshed!");
     } catch (error) {
       console.log(error);
       const err = new Error(error);
