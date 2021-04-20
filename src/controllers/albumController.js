@@ -320,7 +320,8 @@ const convertAudio = async (req, res, next) => {
   var apiInstance = new CloudmersiveVideoApiClient.AudioApi();
 
   var opts = {
-    fileUrl: "https://www.dropbox.com/s/jbrnoxqlb8izem6/Amb4.wav", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
+    fileUrl:
+      "https://res.cloudinary.com/vernalequinox000/video/upload/v1617616998/albumFiles/uhwp0epahvmqcephdqyo.wav", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
     bitRate: 48, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
   };
 
@@ -331,7 +332,8 @@ const convertAudio = async (req, res, next) => {
       console.log("API called successfully. Returned data: " + data);
       const response = data;
       console.log(response);
-      return response;
+      //return response;
+      res.send(response);
     }
   };
   apiInstance.audioConvertToM4a(opts, callback);

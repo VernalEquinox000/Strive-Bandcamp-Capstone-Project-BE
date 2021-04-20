@@ -53,6 +53,8 @@ const login = async (req, res, next) => {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
+
+        /* THIS--->res.redirect (login / signup + ? access Token DA SALVERE NEL FE) */
       });
 
       await user.save();
