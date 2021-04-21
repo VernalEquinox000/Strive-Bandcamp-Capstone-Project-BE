@@ -4,6 +4,7 @@ const AlbumModel = mongoose.model("Album", AlbumSchema);
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
+const q2m = require("query-to-mongo");
 //new below
 const CloudmersiveVideoApiClient = require("cloudmersive-video-api-client");
 const defaultClient = CloudmersiveVideoApiClient.ApiClient.instance;
@@ -62,8 +63,8 @@ const getAlbumQuery = async (req, res, next) => {
     const albums = await AlbumModel.find(query.criteria, query.options.fields)
       .skip(query.options.skip)
       .limit(query.options.limit)
-      .sort(query.options.sort)
-      .populate("albumSongs", { _id: 0, title: 1 });
+      .sort(query.options.sort);
+
     res.send({ links: query.links("/albums", totAlbums), albums });
   } catch (error) {
     console.log(error);
@@ -75,7 +76,10 @@ const getAlbumQuery = async (req, res, next) => {
 const getSingleAlbum = async (req, res, next) => {
   try {
     const id = req.params.albumId;
-    const album = await AlbumModel.findById(id).populate("albumSongs");
+    let album = await AlbumModel.findOne({ _id: id });
+    const songs = album.songs;
+    const sortData = songs.sort((a, b) => a.number - b.number);
+    album.song = sortData;
     if (album) {
       res.send(album);
     } else {

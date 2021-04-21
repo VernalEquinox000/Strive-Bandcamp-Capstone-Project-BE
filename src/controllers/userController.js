@@ -203,12 +203,7 @@ const getUserById = async (req, res, next) => {
       //add other path if needed,
       ,
     ]);
-    /* .populate([
-        {
-          path: "albumSongs",
-          select: ["_id", "songName"],
-        },
-      ]); */
+
     if (user) {
       res.status(200).send(user);
     } else {
@@ -222,7 +217,7 @@ const getUserById = async (req, res, next) => {
 };
 
 //GET Google Auth
-const googleAuth = async (req, res, next) => {
+/* const googleAuth = async (req, res, next) => {
   try {
     res.cookie("accessToken", req.user.tokens.token, {
       httpOnly: true,
@@ -236,7 +231,7 @@ const googleAuth = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}; */
 
 //POST Profile pic
 const addProfilePic = async (req, res, next) => {
@@ -302,7 +297,7 @@ module.exports = {
   deleteUser,
   refreshToken,
   getUserById,
-  googleAuth,
+  /* googleAuth */
   addProfilePic,
   addBackgroundPic,
   addHeaderPic,
