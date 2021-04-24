@@ -3,12 +3,6 @@ const Schema = mongoose.Schema;
 
 const AlbumSchema = new Schema(
   {
-    /* artistName: {
-      type: mongoose.ObjectId,
-      ref: "User",
-      required: true,
-      unique: true,
-    }, */
     title: {
       type: String, //insert ref to user
       required: true,
@@ -21,13 +15,8 @@ const AlbumSchema = new Schema(
     },
     releaseDate: {
       type: Date,
-    }, //ref to songs
-    /* songs: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Song",
-      },
-    ], */ songs: [
+    },
+    songs: [
       {
         songTitle: {
           type: String,
@@ -37,18 +26,11 @@ const AlbumSchema = new Schema(
           type: Number,
           min: [1],
         },
-        artistId: {
-          type: String, //add ref to User
-        },
         duration: {
           type: Number,
         },
         price: {
           type: Number,
-        },
-        songFeatured: {
-          //song which will appear as "cover"
-          type: Boolean,
         },
         audioFile: {
           type: String,
@@ -56,11 +38,9 @@ const AlbumSchema = new Schema(
       },
     ],
     tags: [{ type: String }],
-    extraFiles: [{ type: String }],
-    //releaseMail: {type:String} check
 
     artistId: {
-      type: String,
+      type: String, //referred to user._id && user.role==="artist"
     },
   },
   { timestamps: true }

@@ -5,10 +5,6 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
 const q2m = require("query-to-mongo");
-//new below
-const CloudmersiveVideoApiClient = require("cloudmersive-video-api-client");
-const defaultClient = CloudmersiveVideoApiClient.ApiClient.instance;
-const fs = require("fs");
 const { response } = require("express");
 
 //
@@ -316,31 +312,48 @@ const addSongFile = async (req, res, next) => {
   }
 };
 
-const convertAudio = async (req, res, next) => {
-  // Configure API key authorization: Apikey
-  const Apikey = defaultClient.authentications["Apikey"];
-  Apikey.apiKey = process.env.CM_API_KEY;
+//POST convert audio
+const convertIt = async (req, res, next) => {
+  const ffmpeg = require("fluent-ffmpeg");
 
-  var apiInstance = new CloudmersiveVideoApiClient.AudioApi();
-
-  var opts = {
-    //removed URL
-    fileUrl: "", // String | Optional; URL of an audio file being used for conversion. Use this option for files larger than 2GB.
-    bitRate: 48, // Number | Optional; Specify the desired bitrate of the converted audio file in kilobytes per second (kB/s). Value may be between 48 and 1,411. By default, the optimal bitrate will be chosen automatically.
-  };
-
-  var callback = function (error, data, response) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("API called successfully. Returned data: " + data);
-      const response = data;
-      console.log(response);
-      //return response;
-      res.send(response);
+  const albumId = req.params.albumId;
+  const songId = req.params.songId;
+  const { songs } = await AlbumModel.findOne(
+    {
+      _id: mongoose.Types.ObjectId(albumId),
+    },
+    {
+      _id: 0,
+      songs: {
+        $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
+      },
     }
-  };
-  apiInstance.audioConvertToM4a(opts, callback);
+  );
+  console.log(songs); //your path to source file
+
+  /* let track =
+    "https://res.cloudinary.com/vernalequinox000/video/upload/v1617616998/albumFiles/uhwp0epahvmqcephdqyo.wav"; */
+  ffmpeg(songs[0].audioFile)
+    .toFormat("mp3")
+    .on("error", (err) => {
+      console.log("An error occurred: " + err.message);
+    })
+    .on("progress", (progress) => {
+      // console.log(JSON.stringify(progress));
+      console.log("Processing: " + progress.targetSize + " KB converted");
+    })
+    .on("end", () => {
+      console.log("Processing finished !");
+    })
+    .save(`./track${songs[0].number}.mp3`);
+
+  res
+
+    .setHeader(
+      "Content-Disposition",
+      `attachment; filename=${songs[0].number}.mp3`
+    )
+    .send("ok");
 };
 
 module.exports = {
@@ -359,5 +372,6 @@ module.exports = {
   addAlbumCover,
   cloudMulterSongs,
   addSongFile,
-  convertAudio,
+  //convertAudio,
+  convertIt,
 };
