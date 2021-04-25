@@ -226,6 +226,7 @@ const editAlbumSong = async (req, res, next) => {
   }
 };
 
+//DELETE /albums/:albumId/songs/:songId
 const deleteAlbumSong = async (req, res, next) => {
   try {
     const modifiedSong = await AlbumModel.findByIdAndUpdate(
@@ -246,6 +247,7 @@ const deleteAlbumSong = async (req, res, next) => {
   }
 };
 
+//POST album cover
 const addAlbumCover = async (req, res, next) => {
   try {
     const id = req.params.albumId;
@@ -264,6 +266,7 @@ const addAlbumCover = async (req, res, next) => {
   }
 };
 
+//POST song filw
 const addSongFile = async (req, res, next) => {
   try {
     const albumId = req.params.albumId;
@@ -330,9 +333,6 @@ const convertIt = async (req, res, next) => {
     }
   );
   console.log(songs); //your path to source file
-
-  /* let track =
-    "https://res.cloudinary.com/vernalequinox000/video/upload/v1617616998/albumFiles/uhwp0epahvmqcephdqyo.wav"; */
   ffmpeg(songs[0].audioFile)
     .toFormat("mp3")
     .on("error", (err) => {
@@ -347,14 +347,14 @@ const convertIt = async (req, res, next) => {
     })
     .save(`./track${songs[0].number}.mp3`);
 
-  res
-
-    .setHeader(
-      "Content-Disposition",
-      `attachment; filename=${songs[0].number}.mp3`
-    )
-    .send("ok");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${songs[0].number}.mp3` //try to fix by adding title also
+  );
+  res.send("ok");
 };
+
+//
 
 module.exports = {
   addAlbum,
@@ -372,6 +372,5 @@ module.exports = {
   addAlbumCover,
   cloudMulterSongs,
   addSongFile,
-  //convertAudio,
   convertIt,
 };

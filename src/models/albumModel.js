@@ -42,6 +42,10 @@ const AlbumSchema = new Schema(
     artistId: {
       type: String, //referred to user._id && user.role==="artist"
     },
+
+    albumPrice: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
