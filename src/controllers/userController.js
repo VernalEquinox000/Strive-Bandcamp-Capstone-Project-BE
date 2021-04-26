@@ -150,9 +150,10 @@ const allUsers = async (req, res, next) => {
 //GET user logged profile
 const meUser = async (req, res, next) => {
   try {
-    const findMe = UserModel.findOne({ id: req.user._id });
+    const findMe = await UserModel.findOne({ id: req.user._id });
     if (findMe.role === "artist") {
-      const findMeArtist = UserModel.findOne({ id: req.user._id }).populate([
+      //const findMeArtist =
+      await UserModel.findOne({ id: req.user._id }).populate([
         {
           path: "albums",
           select: [
@@ -167,7 +168,8 @@ const meUser = async (req, res, next) => {
         },
       ]);
     } else {
-      const findMeFan = UserModel.findOne({ id: req.user._id }).populate([
+      //const findMeFan =
+      await UserModel.findOne({ id: req.user._id }).populate([
         {
           path: "albumsCollected",
           select: [
