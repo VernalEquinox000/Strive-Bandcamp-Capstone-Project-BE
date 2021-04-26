@@ -28,13 +28,13 @@ const signup = async (req, res, next) => {
       res.send("Email already in use!");
     }
     //add cookie
-    /* res.cookie("refreshToken", token.refreshToken, {
+    res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       path: "/users/refreshToken",
     });
-    res.status(201).cookie("accessToken", token.token, {
+    res.status(201).cookie("accessToken", token.accessToken, {
       httpOnly: true,
-    }); */
+    });
   } catch (error) {
     console.log(error);
     next(error);
@@ -53,6 +53,8 @@ const login = async (req, res, next) => {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
+
+        /* THIS--->res.redirect (login / signup + ? access Token DA SALVERE NEL FE) */
       });
 
       await user.save();
@@ -102,19 +104,24 @@ const logoutAll = async (req, res, next) => {
 //POST Refresh Token
 const refreshToken = async (req, res, next) => {
   console.log(req.cookies);
-  const oldRefreshToken = req.body.refreshToken;
+  const oldRefreshToken = req.cookies.refreshToken;
   if (!oldRefreshToken) {
     const err = new Error("Refresh token missing");
     err.httpStatusCode = 400;
     next(err);
   } else {
     try {
-      const newTokens = await refreshTokenUtil(oldRefreshToken);
+      const { accessToken, refreshToken } = await refreshTokenUtil(
+        oldRefreshToken
+      );
       res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
       });
-      res.send(newTokens);
+      res.send("tokens are refreshed!");
     } catch (error) {
       console.log(error);
       const err = new Error(error);
@@ -143,7 +150,42 @@ const allUsers = async (req, res, next) => {
 //GET user logged profile
 const meUser = async (req, res, next) => {
   try {
-    const findMe = UserModel.findOne({ id: req.user._id });
+    const findMe = await UserModel.findOne({ id: req.user._id });
+    if (findMe.role === "artist") {
+      //const findMeArtist =
+      await UserModel.findOne({ id: req.user._id }).populate([
+        {
+          path: "albums",
+          select: [
+            "_id",
+            "title",
+            "description",
+            "cover",
+            "releaseDate",
+            "songs",
+            "tags",
+          ],
+        },
+      ]);
+    } else {
+      //const findMeFan =
+      await UserModel.findOne({ id: req.user._id }).populate([
+        {
+          path: "albumsCollected",
+          select: [
+            "_id",
+            "title",
+            "description",
+            "cover",
+            "releaseDate",
+            "songs",
+            "albumPrice",
+          ],
+        },
+        //add other path if needed,
+        ,
+      ]);
+    }
     console.log(findMe);
     res.send(req.user);
   } catch (error) {
@@ -196,12 +238,7 @@ const getUserById = async (req, res, next) => {
       //add other path if needed,
       ,
     ]);
-    /* .populate([
-        {
-          path: "albumSongs",
-          select: ["_id", "songName"],
-        },
-      ]); */
+
     if (user) {
       res.status(200).send(user);
     } else {
@@ -215,7 +252,7 @@ const getUserById = async (req, res, next) => {
 };
 
 //GET Google Auth
-const googleAuth = async (req, res, next) => {
+/* const googleAuth = async (req, res, next) => {
   try {
     res.cookie("accessToken", req.user.tokens.token, {
       httpOnly: true,
@@ -229,7 +266,7 @@ const googleAuth = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}; */
 
 //POST Profile pic
 const addProfilePic = async (req, res, next) => {
@@ -295,7 +332,7 @@ module.exports = {
   deleteUser,
   refreshToken,
   getUserById,
-  googleAuth,
+  /* googleAuth */
   addProfilePic,
   addBackgroundPic,
   addHeaderPic,
