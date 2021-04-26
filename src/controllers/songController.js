@@ -97,6 +97,49 @@ const deleteSong = async (req, res, next) => {
   }
 };
 
+//DOWNLOAD song
+/* const downloadSong = async (req, res, next) => {
+  try {
+    const fs = require("fs");
+    const { createFFmpeg, fetchFile } = require("@ffmpeg/ffmpeg");
+
+    const ffmpeg = createFFmpeg({ log: true });
+
+    (async () => {
+      await ffmpeg.load();
+      ffmpeg.FS("writeFile", "test.wav", await fetchFile("./test.wav"));
+      await ffmpeg.run("-i", "test.avi", "test.mp4");
+      await fs.promises.writeFile(
+        "./test.mp4",
+        ffmpeg.FS("readFile", "test.mp4")
+      );
+      process.exit(0);
+    })();
+  } catch (error) {
+    next(error);
+  }
+}; */
+
+/* var defaultClient = CloudmersiveValidateApiClient.ApiClient.instance;
+
+// Configure API key authorization: Apikey
+var Apikey = defaultClient.authentications["Apikey"];
+Apikey.apiKey = "YOUR_API_KEY_HERE";
+
+var api = new CloudmersiveValidateApiClient.DomainApi();
+
+var domain = "cloudmersive.com"; // {String} Domain name to check, for example \"cloudmersive.com\".  The input is a string so be sure to enclose it in double-quotes.
+
+var callback = function (error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log("API called successfully. Returned data: " + data);
+  }
+};
+
+api.domainCheck(domain, callback); */
+
 module.exports = {
   addSong,
   getAllSongs,

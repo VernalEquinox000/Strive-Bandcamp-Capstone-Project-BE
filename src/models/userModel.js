@@ -28,9 +28,15 @@ const UserSchema = new Schema(
     },
 
     albums: [{ type: Schema.Types.ObjectId, ref: "Album" }],
+    albumsCollected: [{ type: Schema.Types.ObjectId, ref: "Album" }],
 
     //need to add URL
-    location: {
+    address: { type: String },
+
+    city: {
+      type: String,
+    },
+    state: {
       type: String,
     },
     url: [
@@ -45,13 +51,7 @@ const UserSchema = new Schema(
     },
     refreshTokens: [{ type: String }],
     //need to add terms check
-    googleId: {
-      type: String,
-    },
     profilePic: {
-      type: String,
-    },
-    backgroundPic: {
       type: String,
     },
     headerPic: {

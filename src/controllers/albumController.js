@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
 const AlbumSchema = require("../models/albumModel");
 const AlbumModel = mongoose.model("Album", AlbumSchema);
+const UserSchema = require("../models/userModel");
+const UserModel = mongoose.model("User", UserSchema);
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
+const q2m = require("query-to-mongo");
+const { response } = require("express");
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -31,7 +35,16 @@ const addAlbum = async (req, res, next) => {
   try {
     const newAlbum = new AlbumModel(req.body);
     const { _id } = await newAlbum.save();
-    res.status(201).send(_id);
+    let artist = await UserModel.findOneAndUpdate(
+      { _id: req.body.artistId },
+      {
+        $push: {
+          albums: newAlbum._id,
+        },
+      }
+    );
+    console.log(artist);
+    res.status(201).send(newAlbum);
   } catch (error) {
     next(error);
   }
@@ -39,8 +52,7 @@ const addAlbum = async (req, res, next) => {
 
 const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await AlbumModel.find();
-    //also findOne or findById
+    const albums = await AlbumModel.find().sort({ releaseDate: -1 });
     res.send(albums);
   } catch (error) {
     next(error);
@@ -57,8 +69,8 @@ const getAlbumQuery = async (req, res, next) => {
     const albums = await AlbumModel.find(query.criteria, query.options.fields)
       .skip(query.options.skip)
       .limit(query.options.limit)
-      .sort(query.options.sort)
-      .populate("albumSongs", { _id: 0, title: 1 });
+      .sort(query.options.sort);
+
     res.send({ links: query.links("/albums", totAlbums), albums });
   } catch (error) {
     console.log(error);
@@ -70,7 +82,10 @@ const getAlbumQuery = async (req, res, next) => {
 const getSingleAlbum = async (req, res, next) => {
   try {
     const id = req.params.albumId;
-    const album = await AlbumModel.findById(id).populate("albumSongs");
+    let album = await AlbumModel.findOne({ _id: id });
+    const songs = album.songs;
+    const sortData = songs.sort((a, b) => a.number - b.number);
+    album.song = sortData;
     if (album) {
       res.send(album);
     } else {
@@ -110,6 +125,14 @@ const deleteAlbum = async (req, res, next) => {
     const id = req.params.albumId;
     const album = await AlbumModel.findByIdAndDelete(id);
     if (album) {
+      let artist = await UserModel.findOneAndUpdate(
+        { _id: req.body.artistId },
+        {
+          $pull: {
+            albums: album._id,
+          },
+        }
+      );
       res.send("Deleted");
     } else {
       const error = new Error(`album with id ${req.params.albumId} not found`);
@@ -221,6 +244,7 @@ const editAlbumSong = async (req, res, next) => {
   }
 };
 
+//DELETE /albums/:albumId/songs/:songId
 const deleteAlbumSong = async (req, res, next) => {
   try {
     const modifiedSong = await AlbumModel.findByIdAndUpdate(
@@ -241,6 +265,7 @@ const deleteAlbumSong = async (req, res, next) => {
   }
 };
 
+//POST album cover
 const addAlbumCover = async (req, res, next) => {
   try {
     const id = req.params.albumId;
@@ -259,25 +284,8 @@ const addAlbumCover = async (req, res, next) => {
   }
 };
 
+//POST song filw
 const addSongFile = async (req, res, next) => {
-  /* try {
-    const id = req.params.albumId;
-    const addPicture = await AlbumModel.findByIdAndUpdate(id, {
-      songs: {
-        $set: {
-          audioFile: req.file.path,
-        },
-      },
-    });
-    if (addPicture) {
-      res.status(200).send(addPicture);
-    } else {
-      res.send("Album not found!");
-    }
-  } catch (error) {
-    console.log(error);
-  }
-}; */
   try {
     const albumId = req.params.albumId;
     const songId = req.params.songId;
@@ -325,6 +333,47 @@ const addSongFile = async (req, res, next) => {
   }
 };
 
+//POST convert audio
+const convertIt = async (req, res, next) => {
+  const ffmpeg = require("fluent-ffmpeg");
+
+  const albumId = req.params.albumId;
+  const songId = req.params.songId;
+  const { songs } = await AlbumModel.findOne(
+    {
+      _id: mongoose.Types.ObjectId(albumId),
+    },
+    {
+      _id: 0,
+      songs: {
+        $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
+      },
+    }
+  );
+  console.log(songs); //your path to source file
+  ffmpeg(songs[0].audioFile)
+    .toFormat("mp3")
+    .on("error", (err) => {
+      console.log("An error occurred: " + err.message);
+    })
+    .on("progress", (progress) => {
+      // console.log(JSON.stringify(progress));
+      console.log("Processing: " + progress.targetSize + " KB converted");
+    })
+    .on("end", () => {
+      console.log("Processing finished !");
+    })
+    .save(`./track${songs[0].number}.mp3`);
+
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${songs[0].number}.mp3` //try to fix by adding title also
+  );
+  res.send("ok");
+};
+
+//
+
 module.exports = {
   addAlbum,
   getAllAlbums,
@@ -341,4 +390,5 @@ module.exports = {
   addAlbumCover,
   cloudMulterSongs,
   addSongFile,
+  convertIt,
 };
