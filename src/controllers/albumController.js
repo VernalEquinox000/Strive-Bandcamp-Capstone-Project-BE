@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const AlbumSchema = require("../models/albumModel");
 const AlbumModel = mongoose.model("Album", AlbumSchema);
+const UserSchema = require("../models/userModel");
+const UserModel = mongoose.model("User", UserSchema);
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
@@ -33,7 +35,16 @@ const addAlbum = async (req, res, next) => {
   try {
     const newAlbum = new AlbumModel(req.body);
     const { _id } = await newAlbum.save();
-    res.status(201).send(_id);
+    let artist = await UserModel.findOneAndUpdate(
+      { _id: req.body.artistId },
+      {
+        $push: {
+          albums: newAlbum._id,
+        },
+      }
+    );
+    console.log(artist);
+    res.status(201).send(newAlbum);
   } catch (error) {
     next(error);
   }
@@ -41,8 +52,7 @@ const addAlbum = async (req, res, next) => {
 
 const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await AlbumModel.find();
-    //also findOne or findById
+    const albums = await AlbumModel.find().sort({ releaseDate: -1 });
     res.send(albums);
   } catch (error) {
     next(error);
@@ -115,6 +125,14 @@ const deleteAlbum = async (req, res, next) => {
     const id = req.params.albumId;
     const album = await AlbumModel.findByIdAndDelete(id);
     if (album) {
+      let artist = await UserModel.findOneAndUpdate(
+        { _id: req.body.artistId },
+        {
+          $pull: {
+            albums: album._id,
+          },
+        }
+      );
       res.send("Deleted");
     } else {
       const error = new Error(`album with id ${req.params.albumId} not found`);

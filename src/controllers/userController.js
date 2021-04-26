@@ -151,6 +151,39 @@ const allUsers = async (req, res, next) => {
 const meUser = async (req, res, next) => {
   try {
     const findMe = UserModel.findOne({ id: req.user._id });
+    if (findMe.role === "artist") {
+      const findMeArtist = UserModel.findOne({ id: req.user._id }).populate([
+        {
+          path: "albums",
+          select: [
+            "_id",
+            "title",
+            "description",
+            "cover",
+            "releaseDate",
+            "songs",
+            "tags",
+          ],
+        },
+      ]);
+    } else {
+      const findMeFan = UserModel.findOne({ id: req.user._id }).populate([
+        {
+          path: "albumsCollected",
+          select: [
+            "_id",
+            "title",
+            "description",
+            "cover",
+            "releaseDate",
+            "songs",
+            "albumPrice",
+          ],
+        },
+        //add other path if needed,
+        ,
+      ]);
+    }
     console.log(findMe);
     res.send(req.user);
   } catch (error) {
