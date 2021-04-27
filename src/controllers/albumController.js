@@ -8,6 +8,7 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
 const q2m = require("query-to-mongo");
 const { response } = require("express");
+const { pipeline } = require("stream");
 
 //
 const cloudStorageCovers = new CloudinaryStorage({
@@ -363,12 +364,17 @@ const convertIt = async (req, res, next) => {
     })
     .on("end", () => {
       console.log("Processing finished !");
-    })
-    .save(`./track${songs[0].number}.mp3`);
+    });
+  //.save(`./track${songs[0].number}.mp3`);
 
   res.setHeader(
     "Content-Disposition",
     `attachment; filename=${songs[0].number}.mp3` //try to fix by adding title also
+  );
+  pipeline(
+    ffmpeg(songs[0].audiofile, res, (err) => {
+      console.log(err);
+    })
   );
   res.send("ok");
 };
@@ -392,7 +398,14 @@ const getSongLink = async (req, res, next) => {
     console.log(songs);
     if (songs && songs.length > 0) {
       const link = songs[0].audioFile;
-      res.send(link);
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=${songs[0].number}.wav` //try to fix by adding title also
+      );
+      pipeline(link, res, (err) => {
+        console.log(err);
+      });
+      res.send("ok");
     } else {
       return "No audio file available!";
     }
