@@ -11,8 +11,9 @@ const {
   cloudMulter,
   addProfilePic,
   addHeaderPic,
-  addBackgroundPic,
+  //addBackgroundPic,
   getUserById,
+  getUsersQuery,
 } = require("../controllers/userController");
 const { authorize } = require("../middleware/authMiddleware");
 const passport = require("passport");
@@ -33,11 +34,12 @@ const routes = (app) => {
   app
     .route("/users/me/headerPic")
     .post(authorize, cloudMulter.single("headerPic"), addHeaderPic);
-  app
+  /* app
     .route("/users/me/backgroundPic")
-    .post(authorize, cloudMulter.single("backgroundPic"), addProfilePic);
+    .post(authorize, cloudMulter.single("backgroundPic"), addProfilePic); */
 
   app.route("/users/refreshToken").post(refreshToken);
+  app.route("/usersQuery").get(getUsersQuery);
   /*  app
     .route("/googleLogin")
     .get(passport.authenticate("google", { scope: ["profile", "email"] }));

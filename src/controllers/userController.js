@@ -6,6 +6,7 @@ const { authenticate, refreshTokenUtil } = require("../middleware/authTools");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../middleware/cloudinary");
+const q2m = require("query-to-mongo");
 
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -31,9 +32,13 @@ const signup = async (req, res, next) => {
     res.cookie("refreshToken", token.refreshToken, {
       httpOnly: true,
       path: "/users/refreshToken",
+      secure: true,
+      sameSite: "none",
     });
     res.status(201).cookie("accessToken", token.accessToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
     });
   } catch (error) {
     console.log(error);
@@ -53,6 +58,8 @@ const login = async (req, res, next) => {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
+        secure: true,
+        sameSite: "none",
 
         /* THIS--->res.redirect (login / signup + ? access Token DA SALVERE NEL FE) */
       });
@@ -62,6 +69,8 @@ const login = async (req, res, next) => {
         .status(201)
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
+          secure: true,
+          sameSite: "none",
         })
         .send(tokens);
     } else {
@@ -90,7 +99,7 @@ const logout = async (req, res, next) => {
 };
 
 //POST Logout All
-const logoutAll = async (req, res, next) => {
+/* const logoutAll = async (req, res, next) => {
   try {
     req.user.refreshToken = [];
     await req.author.save();
@@ -99,7 +108,7 @@ const logoutAll = async (req, res, next) => {
     console.log(error);
     next(error);
   }
-};
+}; */
 
 //POST Refresh Token
 const refreshToken = async (req, res, next) => {
@@ -116,10 +125,14 @@ const refreshToken = async (req, res, next) => {
       );
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        secure: true,
+        sameSite: "none",
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         path: "/users/refreshToken",
+        secure: true,
+        sameSite: "none",
       });
       res.send("tokens are refreshed!");
     } catch (error) {
@@ -147,8 +160,51 @@ const allUsers = async (req, res, next) => {
   }
 };
 
+//GET users query
+const getUsersQuery = async (req, res, next) => {
+  try {
+    const query = q2m(req.query);
+    console.log(query);
+    const totUsers = await UserModel.countDocuments(query.criteria);
+
+    const users = await UserModel.find(query.criteria, query.options.fields)
+      .skip(query.options.skip)
+      .limit(query.options.limit)
+      .sort(query.options.sort);
+
+    res.send({ links: query.links("/users/links", totUsers), users });
+    res.send(users);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 //GET user logged profile
 const meUser = async (req, res, next) => {
+  try {
+    let findMe = await UserModel.findOne({ _id: req.user._id });
+
+    if (findMe.role === "artist") {
+      const findMeArt = await UserModel.findOne({ _id: req.user._id }).populate(
+        "albums"
+      );
+      res.send(findMeArt);
+    } else if (findMe.role === "fan") {
+      const findMeFan = await UserModel.findOne({ _id: req.user._id }).populate(
+        "albumsCollected"
+      );
+      res.send(findMeFan);
+    } else {
+      res.send("profile not found");
+    }
+    res.send(findMe);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* const meUser = async (req, res, next) => {
   try {
     const findMe = await UserModel.findOne({ id: req.user._id });
     if (findMe.role === "artist") {
@@ -191,7 +247,7 @@ const meUser = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}; */
 
 //PUT update logged user
 const updateUser = (req, res, next) => {
@@ -287,7 +343,7 @@ const addProfilePic = async (req, res, next) => {
 };
 
 //POST Background pic
-const addBackgroundPic = async (req, res, next) => {
+/* const addBackgroundPic = async (req, res, next) => {
   try {
     const addPicture = await UserModel.findByIdAndUpdate(req.user._id, {
       $set: {
@@ -302,7 +358,7 @@ const addBackgroundPic = async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
-};
+}; */
 
 //POST Header Pic
 const addHeaderPic = async (req, res, next) => {
@@ -334,7 +390,8 @@ module.exports = {
   getUserById,
   /* googleAuth */
   addProfilePic,
-  addBackgroundPic,
+  //addBackgroundPic,
   addHeaderPic,
   cloudMulter,
+  getUsersQuery,
 };

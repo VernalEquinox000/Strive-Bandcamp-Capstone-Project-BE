@@ -52,7 +52,7 @@ const addAlbum = async (req, res, next) => {
 
 const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await AlbumModel.find().sort({ releaseDate: -1 });
+    const albums = await AlbumModel.find().sort({ releaseDate: 1 });
     res.send(albums);
   } catch (error) {
     next(error);
@@ -64,14 +64,15 @@ const getAlbumQuery = async (req, res, next) => {
   try {
     const query = q2m(req.query);
     console.log(query);
-    const totAlbums = await AlbumModel.countDocuments(query.criteria);
+    //const totAlbums = await AlbumModel.countDocuments(query.criteria);
 
     const albums = await AlbumModel.find(query.criteria, query.options.fields)
       .skip(query.options.skip)
       .limit(query.options.limit)
       .sort(query.options.sort);
 
-    res.send({ links: query.links("/albums", totAlbums), albums });
+    //res.send({ links: query.links("/albums/links", totAlbums), albums });
+    res.send(albums);
   } catch (error) {
     console.log(error);
     next(error);
@@ -372,7 +373,33 @@ const convertIt = async (req, res, next) => {
   res.send("ok");
 };
 
-//
+//Get wav file
+const getSongLink = async (req, res, next) => {
+  try {
+    const albumId = req.params.albumId;
+    const songId = req.params.songId;
+    const { songs } = await AlbumModel.findOne(
+      {
+        _id: mongoose.Types.ObjectId(albumId),
+      },
+      {
+        _id: 0,
+        songs: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(songId) },
+        },
+      }
+    );
+    console.log(songs);
+    if (songs && songs.length > 0) {
+      const link = songs[0].audioFile;
+      res.send(link);
+    } else {
+      return "No audio file available!";
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
   addAlbum,
@@ -391,4 +418,5 @@ module.exports = {
   cloudMulterSongs,
   addSongFile,
   convertIt,
+  getSongLink,
 };

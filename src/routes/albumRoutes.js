@@ -16,10 +16,12 @@ const {
   addSongFile,
   //convertAudio,
   convertIt,
+  getSongLink,
 } = require("../controllers/albumController");
 
 const routes = (app) => {
-  app.route("/albums").post(addAlbum).get(getAllAlbums).get(getAlbumQuery);
+  app.route("/albums").post(addAlbum).get(getAlbumQuery);
+
   app
     .route("/albums/:albumId")
     .get(getSingleAlbum)
@@ -42,6 +44,7 @@ const routes = (app) => {
     .post(cloudMulterSongs.single("audioFile"), addSongFile);
   //app.route("/albums/convertAudio").post(convertAudio);
   app.route("/albums/:albumId/songs/:songId/convertIt").post(convertIt);
+  app.route("/albums/:albumId/songs/:songId/getSongLink").get(getSongLink);
 };
 
 module.exports = routes;
