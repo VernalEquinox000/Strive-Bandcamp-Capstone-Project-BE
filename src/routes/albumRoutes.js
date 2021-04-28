@@ -20,7 +20,7 @@ const {
 } = require("../controllers/albumController");
 
 const routes = (app) => {
-  app.route("/albums").post(addAlbum).get(getAlbumQuery);
+  app.route("/albums").post(addAlbum).get(getAllAlbums);
 
   app
     .route("/albums/:albumId")

@@ -33,6 +33,7 @@ const corsOptions = {
     }
   },
   credentials: true,
+  exposedHeaders: ["set-cookie"],
 };
 
 server.use(cors(corsOptions));
@@ -56,6 +57,7 @@ mongoose
   .connect(process.env.MONGO_DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then(
     server.listen(port, () => {

@@ -53,7 +53,7 @@ const addAlbum = async (req, res, next) => {
 
 const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await AlbumModel.find().sort({ releaseDate: 1 });
+    const albums = await AlbumModel.find().sort({ releaseDate: -1 });
     res.send(albums);
   } catch (error) {
     next(error);
