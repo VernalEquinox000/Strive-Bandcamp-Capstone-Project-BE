@@ -364,18 +364,15 @@ const convertIt = async (req, res, next) => {
     })
     .on("end", () => {
       console.log("Processing finished !");
-    });
-  //.save(`./track${songs[0].number}.mp3`);
+    })
+    //.pipe(res, { end: true });
+    .save(`../download/track${songs[0].number}.mp3`);
 
   res.setHeader(
     "Content-Disposition",
     `attachment; filename=${songs[0].number}.mp3` //try to fix by adding title also
   );
-  pipeline(
-    ffmpeg(songs[0].audiofile, res, (err) => {
-      console.log(err);
-    })
-  );
+
   res.send("ok");
 };
 

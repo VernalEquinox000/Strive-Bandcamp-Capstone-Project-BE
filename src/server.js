@@ -23,7 +23,7 @@ const server = express();
 
 const port = process.env.PORT || 3001;
 
-const whitelist = [`${process.env.FE_URL}`];
+const whitelist = [`${process.env.REACT_APP_FE_URL}`];
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
