@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/userRoutes");
 const albumRoutes = require("./routes/albumRoutes");
-const songRoutes = require("./routes/songRoutes");
+//const songRoutes = require("./routes/songRoutes");
 const oauth = require("./middleware/oauth");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
@@ -43,7 +43,7 @@ server.use(passport.initialize());
 
 userRoutes(server); //user
 albumRoutes(server);
-songRoutes(server);
+//songRoutes(server);
 
 //ERROR HANDLERS MIDDLEWARES
 server.use(badRequestHandler);
